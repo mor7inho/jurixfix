@@ -20,11 +20,11 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   };
 
   return (
-    <div className="flex relative min-h-screen">
-      {/* Overlay translúcido para mobile - só escurece um pouco */}
+    <div className="flex relative min-h-screen bg-white">
+      {/* Overlay com efeito de blur quando menu está aberto */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-20 z-30 md:hidden"
+          className="fixed inset-0 z-30 md:hidden bg-black/30 backdrop-blur-sm transition-opacity duration-300"
           onClick={closeSidebar}
         />
       )}

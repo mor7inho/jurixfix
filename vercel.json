@@ -1,0 +1,9 @@
+{
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "devCommand": "next dev",
+  "framework": "nextjs",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

@@ -14,6 +14,12 @@ interface PageProps {
   }>;
 }
 
+export async function generateStaticParams() {
+  return (caseData.cases as Case[]).map((caseItem) => ({
+    slug: caseItem.slug,
+  }));
+}
+
 export default async function CasePage({ params }: PageProps) {
   const { slug } = await params;
   const caseItem = (caseData.cases as Case[]).find(
