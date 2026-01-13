@@ -27,8 +27,14 @@ export default function DashboardStats({
     pendente: 0,
   });
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Simular carregamento de 500ms
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
     const cases = caseData.cases as Case[];
     const newStats: Stats = {
       total: cases.length,
@@ -55,10 +61,68 @@ export default function DashboardStats({
 
     setStats(newStats);
     setMounted(true);
+
+    return () => clearTimeout(loadingTimer);
   }, []);
 
   if (!mounted) {
     return null;
+  }
+
+  // Skeleton Loading Component
+  const SkeletonStats = () => (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 shadow-sm">
+      {/* Título Skeleton */}
+      <div className="mb-6">
+        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-2" />
+        <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+      </div>
+
+      {/* Barra de Progresso Skeleton */}
+      <div className="mb-6">
+        <div className="h-4 rounded-full bg-gray-200 animate-pulse mb-4" />
+      </div>
+
+      {/* Cards Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[1, 2, 3].map((index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+            {/* Icon + Title */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gray-300 rounded-lg animate-pulse" />
+                <div className="h-4 w-20 bg-gray-300 rounded animate-pulse" />
+              </div>
+              <div className="h-6 w-12 bg-gray-300 rounded-full animate-pulse" />
+            </div>
+
+            {/* Number Skeleton */}
+            <div className="h-8 w-12 bg-gray-300 rounded animate-pulse mb-2" />
+
+            {/* Text Skeleton */}
+            <div className="h-3 w-32 bg-gray-300 rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+
+      {/* Footer Skeleton */}
+      <div className="mt-6 p-3 bg-gray-100 rounded-lg">
+        <div className="flex items-start gap-2">
+          <div className="w-4 h-4 bg-gray-300 rounded-full flex-shrink-0 mt-0.5 animate-pulse" />
+          <div className="space-y-1 flex-1">
+            <div className="h-3 w-24 bg-gray-300 rounded animate-pulse" />
+            <div className="h-3 w-48 bg-gray-300 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isLoading) {
+    return <SkeletonStats />;
   }
 
   const dominadoPercentage = (stats.dominado / stats.total) * 100 || 0;

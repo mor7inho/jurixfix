@@ -5,6 +5,7 @@ import { Case } from '@/types/case';
 import MemorizationButtons from '@/components/MemorizationButtons';
 import CaseNavigation from '@/components/CaseNavigation';
 import CustomMarkdown from '@/components/CustomMarkdown';
+import FloatingCaseActionBar from '@/components/FloatingCaseActionBar';
 import { getPreviousCase, getNextCase } from '@/lib/caseNavigation';
 import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap, Brain } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +47,7 @@ export default async function CasePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
+      <FloatingCaseActionBar caseTitle={caseItem.title} caseSlug={caseItem.slug} />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
@@ -71,7 +73,7 @@ export default async function CasePage({ params }: PageProps) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full lg:pr-40 pb-40 lg:pb-6">
         {/* Cabeçalho do Caso */}
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-4">
