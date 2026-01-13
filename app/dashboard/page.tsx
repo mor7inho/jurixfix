@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import CaseCard from '@/components/CaseCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
+import StudyStats from '@/components/StudyStats';
 import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 
@@ -178,6 +179,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Estatísticas de Estudo */}
+      <StudyStats cases={cases} />
 
       {/* Filtros */}
       <FilterBar
