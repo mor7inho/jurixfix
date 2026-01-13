@@ -68,20 +68,21 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
           )}
         </div>
 
-        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>Criado em {caseData.createdAt}</span>
+        <div className="flex flex-col gap-2 text-xs text-gray-500 pt-4 border-t border-gray-100">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <div className="flex items-center gap-1 min-w-0">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{caseData.createdAt}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Tag className="w-4 h-4" />
-              <span>{caseData.context}</span>
+            <span className="text-gray-300 hidden sm:inline">•</span>
+            <div className="flex items-center gap-1 min-w-0 sm:flex-1">
+              <Tag className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate text-xs">{caseData.context}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Award className="w-4 h-4" />
-            <span className="font-medium">Emenda: {caseData.simpleEmenda}</span>
+          <div className="flex items-center gap-1 min-w-0">
+            <Award className="w-3 h-3 flex-shrink-0" />
+            <span className="font-medium truncate text-xs">Emenda: {caseData.simpleEmenda}</span>
           </div>
         </div>
       </div>

@@ -7,20 +7,18 @@ export default function DashboardPage() {
   const cases = caseData.cases as Case[];
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8 w-full">
       {/* Cabeçalho */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-2">
-              Gerencie e estude seus casos jurídicos de forma eficiente
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 break-words">Dashboard</h1>
+            <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-sm">
+              Gerencie e estude seus casos jurídicos
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">
-              {cases.length} casos disponíveis
-            </span>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 flex-shrink-0 bg-gray-50 px-2 sm:px-3 py-1 rounded-lg">
+            <span>{cases.length} casos</span>
           </div>
         </div>
 
@@ -29,24 +27,24 @@ export default function DashboardPage() {
       </div>
 
       {/* Disciplina e Módulo */}
-      <div className="mb-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-6 border border-emerald-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+      <div className="mb-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-4 sm:p-6 border border-emerald-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 break-words">
               {caseData.discipline.name}
             </h2>
-            <p className="text-emerald-700 font-medium mt-1">
+            <p className="text-emerald-700 font-medium mt-1 text-xs sm:text-sm break-words">
               {caseData.module.name}
             </p>
-            <p className="text-gray-600 mt-2 max-w-3xl">
+            <p className="text-gray-600 mt-2 text-xs sm:text-sm leading-relaxed max-w-xl">
               Explore os casos práticos que fundamentam o Direito Administrativo brasileiro.
               Cada caso inclui narrativa, conflito, explicação teórica e aplicação prática.
             </p>
           </div>
-          <div className="text-right">
-            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-emerald-200">
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-emerald-700">
+          <div className="flex-shrink-0 min-w-max">
+            <div className="inline-flex items-center gap-1 sm:gap-2 bg-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-emerald-200">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0"></div>
+              <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
                 Atualizado hoje
               </span>
             </div>
@@ -55,7 +53,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Grid de Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {cases.map((caseItem) => (
           <CaseCard key={caseItem.code} caseData={caseItem} />
         ))}
@@ -64,28 +62,28 @@ export default function DashboardPage() {
       {/* Estatísticas */}
       <div className="mt-12 pt-8 border-t border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Estatísticas do Módulo</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="text-2xl font-bold text-gray-900">{cases.length}</div>
-            <div className="text-sm text-gray-600">Casos Totais</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">{cases.length}</div>
+            <div className="text-xs md:text-sm text-gray-600">Casos Totais</div>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="text-2xl font-bold text-emerald-600">
+          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+            <div className="text-xl md:text-2xl font-bold text-emerald-600">
               {cases.filter(c => c.priority === 'altissima').length}
             </div>
-            <div className="text-sm text-gray-600">Prioridade Altíssima</div>
+            <div className="text-xs md:text-sm text-gray-600">Altíssima</div>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+            <div className="text-xl md:text-2xl font-bold text-blue-600">
               {cases.filter(c => c.level === 1).length}
             </div>
-            <div className="text-sm text-gray-600">Nível Iniciante</div>
+            <div className="text-xs md:text-sm text-gray-600">Iniciante</div>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+            <div className="text-xl md:text-2xl font-bold text-purple-600">
               {cases.filter(c => c.tags.includes('regime-juridico')).length}
             </div>
-            <div className="text-sm text-gray-600">Casos de Regime</div>
+            <div className="text-xs md:text-sm text-gray-600">Regime</div>
           </div>
         </div>
       </div>

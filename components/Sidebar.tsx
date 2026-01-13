@@ -28,7 +28,7 @@ const Sidebar = ({ className }: SidebarProps) => {
   return (
     <aside className={cn(
       "flex flex-col w-64 h-screen bg-white border-r border-gray-200",
-      "fixed left-0 top-0",
+      "overflow-y-auto",
       className
     )}>
       {/* Logo */}
