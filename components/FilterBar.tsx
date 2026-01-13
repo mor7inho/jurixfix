@@ -8,13 +8,16 @@ import { FilterStatus } from '@/hooks/useFilteredCases';
 interface FilterBarProps {
   disciplines: string[];
   topics: string[];
+  categories: string[];
   selectedDiscipline: string | null;
   selectedTopics: string[];
+  selectedCategory: string | null;
   selectedStatus?: FilterStatus | null;
   selectedSort?: 'recentes' | 'avaliados';
   caseCount?: number;
   onDisciplineChange: (discipline: string | null) => void;
   onTopicsChange: (topics: string[]) => void;
+  onCategoryChange: (category: string | null) => void;
   onStatusChange?: (status: FilterStatus | null) => void;
   onSortChange?: (sort: 'recentes' | 'avaliados') => void;
   onApplyFilters: () => void;
@@ -24,13 +27,16 @@ interface FilterBarProps {
 export default function FilterBar({
   disciplines,
   topics,
+  categories,
   selectedDiscipline,
   selectedTopics,
+  selectedCategory,
   selectedStatus = null,
   selectedSort = 'recentes',
   caseCount = 0,
   onDisciplineChange,
   onTopicsChange,
+  onCategoryChange,
   onStatusChange = () => {},
   onSortChange = () => {},
   onApplyFilters,
@@ -48,8 +54,11 @@ export default function FilterBar({
   const hasActiveFilters =
     selectedDiscipline !== null ||
     selectedTopics.length > 0 ||
+    (categories.length > 1 && selectedCategory !== null) ||
     selectedStatus !== null ||
     selectedSort !== 'recentes';
+
+  const showCategoryFilter = categories.length > 1;
 
   const toggleTopic = (topic: string) => {
     if (selectedTopics.includes(topic)) {
@@ -110,6 +119,40 @@ export default function FilterBar({
             </div>
           </div>
 
+          {/* Áreas do Direito - Categorias - Só mostra se > 1 */}
+          {showCategoryFilter && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                Áreas do Direito
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedCategory || ''}
+                  onChange={(e) => {
+                    const newCategory = e.target.value || null;
+                    onCategoryChange(newCategory);
+                  }}
+                  className={cn(
+                    'w-full px-4 py-2.5 rounded-lg border appearance-none cursor-pointer transition-all',
+                    'bg-white text-gray-900 text-sm font-medium',
+                    'hover:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent',
+                    selectedCategory
+                      ? 'border-cyan-400 bg-cyan-50'
+                      : 'border-gray-300'
+                  )}
+                >
+                  <option value="">Todas as Áreas</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+              </div>
+            </div>
+          )}
+
           {/* Status */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">Status</label>
@@ -169,6 +212,7 @@ export default function FilterBar({
                 onClick={() => {
                   onDisciplineChange(null);
                   onTopicsChange([]);
+                  onCategoryChange(null);
                   onStatusChange(null);
                   onSortChange('recentes');
                   onClearFilters();
@@ -267,6 +311,17 @@ export default function FilterBar({
                       setTopicSearch('');
                     }}
                     className="hover:text-emerald-900 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+              {selectedCategory && (
+                <div className="inline-flex items-center gap-2 bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-sm font-medium">
+                  <span>{selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}</span>
+                  <button
+                    onClick={() => onCategoryChange(null)}
+                    className="hover:text-cyan-900 transition-colors"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>

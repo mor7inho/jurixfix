@@ -5,6 +5,7 @@ import { ChevronRight, Clock, Tag, Award } from 'lucide-react';
 import { Case } from '@/types/case';
 import { cn, getPriorityColor, getLevelText } from '@/lib/utils';
 import Link from 'next/link';
+import CaseTags from '@/components/CaseTags';
 
 interface CaseCardProps {
   caseData: Case;
@@ -45,6 +46,16 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
         getBorderColor(),
         progress !== null && 'shadow-md'
       )}>
+        {/* Badge de Tópico - Canto Superior Esquerdo */}
+        <div className="absolute top-4 left-4">
+          <div className={cn(
+            "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap border",
+            "bg-indigo-100 text-indigo-800 border-indigo-200"
+          )}>
+            {caseData.topic}
+          </div>
+        </div>
+
         {/* Badge de Status - Canto Superior Direito */}
         <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
           {progress !== null ? (
@@ -83,7 +94,10 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
           )}
         </div>
 
-        <div className="flex items-start justify-between mb-4 pr-40">
+        <div className={cn(
+          "flex items-start justify-between mb-4 pr-40",
+          caseData.category && "pl-40 sm:pl-0"
+        )}>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -121,19 +135,11 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
              caseData.priority === 'alta' ? 'Alta' :
              caseData.priority === 'media' ? 'Média' : 'Baixa'} Prioridade
           </span>
-          {caseData.tags.slice(0, 2).map((tag) => (
-            <span
-              key={tag}
-              className="text-xs text-gray-600 bg-gray-50 px-3 py-1 rounded-full border border-gray-200"
-            >
-              {tag}
-            </span>
-          ))}
-          {caseData.tags.length > 2 && (
-            <span className="text-xs text-gray-500 px-2 py-1">
-              +{caseData.tags.length - 2}
-            </span>
-          )}
+        </div>
+
+        {/* Tags Component */}
+        <div className="mb-4">
+          <CaseTags tags={caseData.tags} maxTags={2} />
         </div>
 
         <div className="flex flex-col gap-2 text-xs text-gray-500 pt-4 border-t border-gray-100">

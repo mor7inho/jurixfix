@@ -9,6 +9,7 @@ export interface Case {
   level: number;
   priority: 'altissima' | 'alta' | 'media' | 'baixa';
   isPublished: boolean;
+  category?: 'administrativo' | 'constitucional' | 'penal' | 'civil' | 'trabalhista' | 'processual' | 'comercial' | 'empresarial' | 'ambiental' | 'internacional' | 'tributário' | 'consumidor' | 'previdenciário' | 'imobiliário' | 'agrário' | 'eleitoral' | 'militar' | 'marítimo' | 'aeronáutico';
   narrativeMd: string;
   conflict: string;
   explanationMd: string;

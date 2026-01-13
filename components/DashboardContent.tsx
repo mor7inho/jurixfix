@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 import CaseCard from '@/components/CaseCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
@@ -21,11 +22,13 @@ export default function DashboardContent() {
   
   const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<FilterStatus | null>(null);
   const [selectedSort, setSelectedSort] = useState<'recentes' | 'avaliados'>('recentes');
   const [appliedDiscipline, setAppliedDiscipline] = useState<string | null>(null);
   const [appliedTopics, setAppliedTopics] = useState<string[]>([]);
+  const [appliedCategory, setAppliedCategory] = useState<string | null>(null);
   const [appliedStatus, setAppliedStatus] = useState<FilterStatus | null>(null);
   const [appliedSort, setAppliedSort] = useState<'recentes' | 'avaliados'>('recentes');
   const [mounted, setMounted] = useState(false);
@@ -35,6 +38,7 @@ export default function DashboardContent() {
     const disciplineParam = searchParams.get('discipline');
     const topicsParam = searchParams.get('topics');
     const searchParam = searchParams.get('search');
+    const categoryParam = searchParams.get('category');
     const statusParam = searchParams.get('status') as FilterStatus | null;
     const sortParam = searchParams.get('sort') as 'recentes' | 'avaliados' | null;
 
@@ -51,6 +55,11 @@ export default function DashboardContent() {
 
     if (searchParam) {
       setSearchTerm(decodeURIComponent(searchParam));
+    }
+
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+      setAppliedCategory(categoryParam);
     }
 
     if (statusParam) {
@@ -84,6 +93,10 @@ export default function DashboardContent() {
       params.set('search', encodeURIComponent(searchTerm));
     }
 
+    if (appliedCategory) {
+      params.set('category', appliedCategory);
+    }
+
     if (appliedStatus) {
       params.set('status', appliedStatus);
     }
@@ -95,7 +108,16 @@ export default function DashboardContent() {
     const queryString = params.toString();
     const newUrl = queryString ? `/dashboard?${queryString}` : '/dashboard';
     router.push(newUrl, { scroll: false });
-  }, [appliedDiscipline, appliedTopics, searchTerm, appliedStatus, appliedSort, mounted, router]);
+  }, [appliedDiscipline, appliedTopics, searchTerm, appliedCategory, appliedStatus, appliedSort, mounted, router]);
+
+  // Limpar tópicos quando categoria muda (para não mostrar tópicos inválidos)
+  useEffect(() => {
+    if (selectedCategory !== appliedCategory) {
+      // Categoria foi alterada - limpar tópicos selecionados
+      setSelectedTopics([]);
+      setAppliedTopics([]);
+    }
+  }, [selectedCategory]);
 
   // Rastrear posição do scroll ao usuário scrollar
   useEffect(() => {
@@ -116,17 +138,31 @@ export default function DashboardContent() {
     return Array.from(uniqueDisciplines).sort();
   }, []);
 
-  // Get topics for selected discipline
+  // Get topics for selected discipline (and category if selected)
   const topics = useMemo(() => {
-    if (!selectedDiscipline) return [];
     const uniqueTopics = new Set<string>();
     cases.forEach((caseItem) => {
+      // If a category is selected, only show topics from that category
+      if (selectedCategory && caseItem.category !== selectedCategory) {
+        return;
+      }
       uniqueTopics.add(caseItem.topic);
     });
     return Array.from(uniqueTopics).sort();
-  }, [selectedDiscipline]);
+  }, [selectedCategory]);
 
-  // Filter cases based on discipline, topics, and search term
+  // Extract unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set<string>();
+    cases.forEach((caseItem) => {
+      if (caseItem.category) {
+        uniqueCategories.add(caseItem.category);
+      }
+    });
+    return Array.from(uniqueCategories).sort();
+  }, []);
+
+  // Filter cases based on discipline, topics, category, and search term
   const filteredCases = useMemo(() => {
     let result = cases.filter((caseItem) => {
       // Filter by discipline
@@ -139,13 +175,21 @@ export default function DashboardContent() {
         return false;
       }
 
-      // Filter by search term (searches in title, code, topic, tags)
+      // Filter by category
+      if (appliedCategory && caseItem.category !== appliedCategory) {
+        return false;
+      }
+
+      // Filter by search term (searches in title, code, topic, tags, conflict, and explanation)
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         return (
           caseItem.title.toLowerCase().includes(searchLower) ||
           caseItem.code.toLowerCase().includes(searchLower) ||
           caseItem.topic.toLowerCase().includes(searchLower) ||
+          caseItem.conflict.toLowerCase().includes(searchLower) ||
+          caseItem.explanationMd.toLowerCase().includes(searchLower) ||
+          caseItem.keyIdea.toLowerCase().includes(searchLower) ||
           caseItem.tags.some((tag) =>
             tag.toLowerCase().includes(searchLower)
           )
@@ -191,11 +235,12 @@ export default function DashboardContent() {
     }
 
     return result;
-  }, [appliedDiscipline, appliedTopics, searchTerm, appliedStatus, appliedSort]);
+  }, [appliedDiscipline, appliedTopics, appliedCategory, searchTerm, appliedStatus, appliedSort]);
 
   const handleApplyFilters = () => {
     setAppliedDiscipline(selectedDiscipline);
     setAppliedTopics(selectedTopics);
+    setAppliedCategory(selectedCategory);
   };
 
   const handleClearFilters = () => {
@@ -203,6 +248,8 @@ export default function DashboardContent() {
     setSelectedTopics([]);
     setAppliedDiscipline(null);
     setAppliedTopics([]);
+    setSelectedCategory(null);
+    setAppliedCategory(null);
     setAppliedStatus(null);
     setAppliedSort('recentes');
     setSelectedStatus(null);
@@ -296,13 +343,16 @@ export default function DashboardContent() {
       <FilterBar
         disciplines={disciplines}
         topics={topics}
+        categories={categories}
         selectedDiscipline={selectedDiscipline}
         selectedTopics={selectedTopics}
+        selectedCategory={selectedCategory}
         selectedStatus={appliedStatus}
         selectedSort={appliedSort}
         caseCount={filteredCases.length}
         onDisciplineChange={setSelectedDiscipline}
         onTopicsChange={setSelectedTopics}
+        onCategoryChange={setSelectedCategory}
         onStatusChange={setAppliedStatus}
         onSortChange={setAppliedSort}
         onApplyFilters={handleApplyFilters}
@@ -311,34 +361,101 @@ export default function DashboardContent() {
 
       {/* Grid de Cards ou Mensagem Vazia */}
       {filteredCases.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="text-center max-w-md">
-            <div className="mb-4 text-5xl">🔍</div>
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
-              Nenhum caso encontrado
+            <div className="mb-6 flex justify-center">
+              {searchTerm ? (
+                <div className="text-6xl">🔍</div>
+              ) : appliedStatus ? (
+                <div className="text-6xl">📋</div>
+              ) : (
+                <div className="text-6xl">📚</div>
+              )}
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+              {searchTerm
+                ? 'Nenhum caso encontrado'
+                : appliedStatus
+                ? 'Nenhum caso neste status'
+                : 'Nenhum caso disponível'}
             </h3>
-            <p className="text-gray-600 mb-6 text-sm md:text-base">
-              {appliedTopics.length > 0
-                ? 'Nenhum caso encontrado para esses assuntos.'
-                : appliedDiscipline
-                ? 'Nenhum caso encontrado para essa matéria.'
-                : searchTerm
-                ? 'Nenhum caso encontrado com este termo de busca.'
+            <p className="text-gray-600 mb-8 text-sm md:text-base leading-relaxed">
+              {searchTerm
+                ? `Não encontramos casos para "${searchTerm}". Tente buscar por:
+                  - Título do caso
+                  - Código (ex: DA-M01-C001)
+                  - Tópico jurídico
+                  - Termos da explicação
+                  - Tags relacionadas`
+                : appliedTopics.length > 0
+                ? 'Nenhum caso encontrado para esses assuntos. Tente alterar os filtros.'
+                : appliedStatus
+                ? 'Nenhum caso com este status. Que tal revisar os pendentes?'
                 : 'Nenhum caso disponível no momento.'}
             </p>
-            <button
-              onClick={handleClearFilters}
-              className="inline-flex items-center justify-center px-4 py-2 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors text-sm"
-            >
-              Limpar Filtros
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={handleClearFilters}
+                className="inline-flex items-center justify-center px-6 py-2.5 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors text-sm"
+              >
+                Limpar Filtros
+              </button>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="inline-flex items-center justify-center px-6 py-2.5 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                >
+                  Limpar Busca
+                </button>
+              )}
+            </div>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {filteredCases.map((caseItem) => (
-            <CaseCard key={caseItem.code} caseData={caseItem} />
-          ))}
+        <div>
+          {/* Indicador de Busca Ativa */}
+          {(searchTerm || appliedStatus) && (
+            <div className="mb-6 flex flex-wrap gap-2 items-center">
+              {searchTerm && (
+                <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-2">
+                  <span className="text-sm text-emerald-700">
+                    <span className="font-semibold">Buscando:</span> "{searchTerm}"
+                  </span>
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="ml-1 text-emerald-600 hover:text-emerald-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              {appliedStatus && (
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2">
+                  <span className="text-sm text-blue-700">
+                    <span className="font-semibold">Status:</span>{' '}
+                    {appliedStatus === 'dominado'
+                      ? 'Dominado'
+                      : appliedStatus === 'em-revisao'
+                      ? 'Em Revisão'
+                      : 'Pendente'}
+                  </span>
+                  <button
+                    onClick={() => setAppliedStatus(null)}
+                    className="ml-1 text-blue-600 hover:text-blue-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Grid de Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {filteredCases.map((caseItem) => (
+              <CaseCard key={caseItem.code} caseData={caseItem} />
+            ))}
+          </div>
         </div>
       )}
 
