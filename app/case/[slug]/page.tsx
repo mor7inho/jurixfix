@@ -89,15 +89,15 @@ export default async function CasePage({ params }: PageProps) {
             {caseItem.topic}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
-            <div className="flex items-center gap-1">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+            <div className="flex items-center gap-1 min-w-0">
               <BookOpen className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">Contexto: {caseItem.context}</span>
             </div>
             <div className="hidden sm:inline">•</div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 min-w-0">
               <Target className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">Emenda: {caseItem.simpleEmenda}</span>
+              <span className="break-words">Emenda: {caseItem.simpleEmenda}</span>
             </div>
           </div>
         </div>

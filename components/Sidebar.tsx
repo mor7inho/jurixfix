@@ -1,14 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Home, BookOpen, Search, User, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { Home, BookOpen, Search, User, Settings, LogOut, ChevronRight, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   className?: string;
+  onToggleHide?: () => void;
 }
 
-const Sidebar = ({ className }: SidebarProps) => {
+const Sidebar = ({ className, onToggleHide }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: 'Dashboard', active: true },
     { icon: BookOpen, label: 'Casos', active: false },
@@ -32,7 +33,7 @@ const Sidebar = ({ className }: SidebarProps) => {
       className
     )}>
       {/* Logo */}
-      <div className="p-6 border-b">
+      <div className="p-6 border-b flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">J</span>
@@ -42,6 +43,17 @@ const Sidebar = ({ className }: SidebarProps) => {
             <p className="text-xs text-gray-500">SaaS Jurídico</p>
           </div>
         </div>
+        {/* Botão de ocultar sidebar */}
+        {onToggleHide && (
+          <button
+            onClick={onToggleHide}
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors hidden md:block"
+            title="Ocultar menu"
+            aria-label="Ocultar menu"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+        )}
       </div>
 
       {/* Menu Principal */}
