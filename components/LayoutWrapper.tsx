@@ -49,7 +49,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
       {sidebarHidden && (
         <button
           onClick={toggleSidebarVisibility}
-          className="fixed left-0 top-16 z-30 p-2 bg-emerald-500 hover:bg-emerald-600 rounded-r-lg transition-colors hidden md:block"
+          className="fixed left-0 top-20 z-[60] p-2 bg-emerald-500 hover:bg-emerald-600 rounded-r-lg transition-colors hidden md:block"
           title="Mostrar menu"
           aria-label="Mostrar menu"
         >
@@ -65,10 +65,10 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         />
       )}
 
-      {/* Sidebar com estado - oculta quando sidebarHidden é true */}
-      {!sidebarHidden && (
+      {/* Sidebar com estado - oculta quando sidebarHidden é true (desktop) ou mostra quando sidebarOpen (mobile) */}
+      {(!sidebarHidden || sidebarOpen) && (
         <div
-          className={`fixed md:relative z-40 h-screen transition-transform duration-300 ease-in-out ${
+          className={`fixed md:relative z-40 h-screen w-64 transition-transform duration-300 ease-in-out ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
           }`}
         >
