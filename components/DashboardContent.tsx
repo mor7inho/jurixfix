@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import CaseCard from '@/components/CaseCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
+import StatusFilterButtons from '@/components/StatusFilterButtons';
 import StudyStats from '@/components/StudyStats';
 import StatisticsCards from '@/components/StatisticsCards';
+import DashboardStats from '@/components/DashboardStats';
+import { useFilteredCases, FilterStatus } from '@/hooks/useFilteredCases';
 import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 
@@ -14,12 +17,17 @@ export default function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cases = caseData.cases as Case[];
+  const scrollPositionRef = useRef<number>(0);
   
   const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<FilterStatus | null>(null);
+  const [selectedSort, setSelectedSort] = useState<'recentes' | 'avaliados'>('recentes');
   const [appliedDiscipline, setAppliedDiscipline] = useState<string | null>(null);
   const [appliedTopics, setAppliedTopics] = useState<string[]>([]);
+  const [appliedStatus, setAppliedStatus] = useState<FilterStatus | null>(null);
+  const [appliedSort, setAppliedSort] = useState<'recentes' | 'avaliados'>('recentes');
   const [mounted, setMounted] = useState(false);
 
   // Load filters from URL on mount
@@ -27,6 +35,8 @@ export default function DashboardContent() {
     const disciplineParam = searchParams.get('discipline');
     const topicsParam = searchParams.get('topics');
     const searchParam = searchParams.get('search');
+    const statusParam = searchParams.get('status') as FilterStatus | null;
+    const sortParam = searchParams.get('sort') as 'recentes' | 'avaliados' | null;
 
     if (disciplineParam) {
       setSelectedDiscipline(disciplineParam);
@@ -43,10 +53,20 @@ export default function DashboardContent() {
       setSearchTerm(decodeURIComponent(searchParam));
     }
 
+    if (statusParam) {
+      setSelectedStatus(statusParam);
+      setAppliedStatus(statusParam);
+    }
+
+    if (sortParam) {
+      setSelectedSort(sortParam);
+      setAppliedSort(sortParam);
+    }
+
     setMounted(true);
   }, [searchParams]);
 
-  // Update URL when filters change
+  // Update URL when filters change (sem fazer scroll para topo)
   useEffect(() => {
     if (!mounted) return;
 
@@ -64,10 +84,28 @@ export default function DashboardContent() {
       params.set('search', encodeURIComponent(searchTerm));
     }
 
+    if (appliedStatus) {
+      params.set('status', appliedStatus);
+    }
+
+    if (appliedSort !== 'recentes') {
+      params.set('sort', appliedSort);
+    }
+
     const queryString = params.toString();
     const newUrl = queryString ? `/dashboard?${queryString}` : '/dashboard';
-    router.push(newUrl);
-  }, [appliedDiscipline, appliedTopics, searchTerm, mounted, router]);
+    router.push(newUrl, { scroll: false });
+  }, [appliedDiscipline, appliedTopics, searchTerm, appliedStatus, appliedSort, mounted, router]);
+
+  // Rastrear posição do scroll ao usuário scrollar
+  useEffect(() => {
+    const handleScroll = () => {
+      scrollPositionRef.current = window.scrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Extract unique disciplines
   const disciplines = useMemo(() => {
@@ -90,7 +128,7 @@ export default function DashboardContent() {
 
   // Filter cases based on discipline, topics, and search term
   const filteredCases = useMemo(() => {
-    return cases.filter((caseItem) => {
+    let result = cases.filter((caseItem) => {
       // Filter by discipline
       if (appliedDiscipline && caseData.discipline.name !== appliedDiscipline) {
         return false;
@@ -116,7 +154,44 @@ export default function DashboardContent() {
 
       return true;
     });
-  }, [appliedDiscipline, appliedTopics, searchTerm]);
+
+    // Apply status filter if selected
+    if (appliedStatus) {
+      const ratings = (() => {
+        if (typeof window === 'undefined') return {};
+        const saved = localStorage.getItem('jurisfix-ratings');
+        return saved ? JSON.parse(saved) : {};
+      })();
+
+      result = result.filter((caseItem) => {
+        const rating = ratings[caseItem.slug] ?? null;
+        if (appliedStatus === 'pendente') return rating === null;
+        if (appliedStatus === 'em-revisao') return rating !== null && rating < 4;
+        if (appliedStatus === 'dominado') return rating !== null && rating >= 4;
+        return true;
+      });
+    }
+
+    // Apply sorting
+    if (appliedSort === 'avaliados') {
+      const ratings = (() => {
+        if (typeof window === 'undefined') return {};
+        const saved = localStorage.getItem('jurisfix-ratings');
+        return saved ? JSON.parse(saved) : {};
+      })();
+
+      result.sort((a, b) => {
+        const ratingA = ratings[a.slug] ?? 0;
+        const ratingB = ratings[b.slug] ?? 0;
+        return ratingB - ratingA;
+      });
+    } else {
+      // Sort by date (newer first)
+      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
+    return result;
+  }, [appliedDiscipline, appliedTopics, searchTerm, appliedStatus, appliedSort]);
 
   const handleApplyFilters = () => {
     setAppliedDiscipline(selectedDiscipline);
@@ -128,7 +203,28 @@ export default function DashboardContent() {
     setSelectedTopics([]);
     setAppliedDiscipline(null);
     setAppliedTopics([]);
+    setAppliedStatus(null);
+    setAppliedSort('recentes');
+    setSelectedStatus(null);
+    setSelectedSort('recentes');
     setSearchTerm('');
+  };
+
+  const handleStatusFilterClick = (status: 'dominado' | 'revisao' | 'pendente' | null) => {
+    // Salvar posição ANTES de mudar o filtro
+    scrollPositionRef.current = window.scrollY;
+
+    let newStatus: FilterStatus | null = null;
+    
+    if (status === 'dominado') {
+      newStatus = 'dominado';
+    } else if (status === 'revisao') {
+      newStatus = 'em-revisao';
+    } else if (status === 'pendente') {
+      newStatus = 'pendente';
+    }
+    
+    setAppliedStatus(newStatus);
   };
 
   if (!mounted) {
@@ -154,6 +250,15 @@ export default function DashboardContent() {
         {/* Busca */}
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
       </div>
+
+      {/* Resumo de Progresso */}
+      <DashboardStats onStatusFilterClick={handleStatusFilterClick} />
+
+      {/* Filtros de Status - Rápido e Visível */}
+      <StatusFilterButtons
+        selectedStatus={appliedStatus}
+        onStatusChange={setAppliedStatus}
+      />
 
       {/* Disciplina e Módulo */}
       <div className="mb-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-4 sm:p-6 border border-emerald-100">
@@ -193,8 +298,13 @@ export default function DashboardContent() {
         topics={topics}
         selectedDiscipline={selectedDiscipline}
         selectedTopics={selectedTopics}
+        selectedStatus={appliedStatus}
+        selectedSort={appliedSort}
+        caseCount={filteredCases.length}
         onDisciplineChange={setSelectedDiscipline}
         onTopicsChange={setSelectedTopics}
+        onStatusChange={setAppliedStatus}
+        onSortChange={setAppliedSort}
         onApplyFilters={handleApplyFilters}
         onClearFilters={handleClearFilters}
       />

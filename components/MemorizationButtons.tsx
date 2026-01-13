@@ -48,6 +48,7 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
       // Mostrar toast de sucesso com mensagem dinâmica
       toast.success(`${message.title} - Nota ${selectedScore}/5`, {
         description: message.desc,
+        icon: selectedScore >= 4 ? '🎉' : '📝',
         duration: 3000,
       });
       
@@ -64,101 +65,128 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="space-y-6 sm:space-y-8">
+      {/* Grid de Scores */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
         {scores.map((score) => (
           <button
             key={score.value}
             onClick={() => handleScoreClick(score.value)}
             className={cn(
-              "flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200",
-              "hover:scale-[1.02] active:scale-[0.98]",
+              "flex flex-col items-center justify-center p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl border-2 transition-all duration-200",
+              "hover:scale-105 active:scale-95 hover:-translate-y-1",
               selectedScore === score.value
-                ? "border-emerald-500 shadow-lg transform scale-[1.02]"
+                ? "border-emerald-500 shadow-lg scale-105 ring-2 ring-emerald-200"
                 : progress === score.value
-                ? "border-emerald-400 shadow-lg"
+                ? "border-emerald-400 shadow-md"
                 : "border-gray-200 hover:border-gray-300",
               score.color
             )}
             disabled={isSubmitted}
+            aria-label={`Avaliar como ${score.value} - ${score.label}`}
           >
-            <div className="text-2xl font-bold mb-2">{score.value}</div>
-            <div className="text-sm font-medium">{score.label}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2">{score.value}</div>
+            <div className="text-xs sm:text-sm font-medium line-clamp-2 text-center leading-tight">
+              {score.label}
+            </div>
             {progress === score.value && (
-              <Check className="w-4 h-4 absolute mt-6 text-emerald-600" />
+              <Check className="w-4 h-4 sm:w-5 sm:h-5 absolute mt-12 sm:mt-14 text-emerald-600 font-bold" />
             )}
           </button>
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-4 pt-4">
+      <div className="flex flex-col items-center gap-4 sm:gap-6 pt-4 sm:pt-6">
         <button
           onClick={handleSubmit}
           disabled={selectedScore === null || isSubmitted}
           className={cn(
-            "px-8 py-4 rounded-xl font-medium text-lg transition-all duration-200 flex items-center gap-3",
+            "w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl font-medium text-base sm:text-lg transition-all duration-200 flex items-center justify-center gap-2 sm:gap-3",
             selectedScore !== null && !isSubmitted
-              ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg hover:shadow-xl"
+              ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           )}
+          aria-label="Confirmar avaliação"
         >
           {isSubmitted ? (
             <>
-              <Check className="w-6 h-6" />
-              Avaliação Registrada!
+              <Check className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="font-semibold">Avaliação Registrada!</span>
             </>
           ) : (
             <>
-              <Brain className="w-6 h-6" />
-              Confirmar Avaliação
+              <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="font-semibold">Confirmar Avaliação</span>
             </>
           )}
         </button>
 
+        {/* Mensagens de Feedback */}
         {isSubmitted && (
-          <div className="text-center">
-            <p className="text-emerald-600 font-medium">
-              Sua avaliação foi salva no sistema de repetição espaçada.
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              O caso será revisado no momento ideal para sua memorização.
-            </p>
+          <div className="text-center animate-in fade-in duration-300">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+              <Check className="w-5 h-5 text-emerald-600" />
+              <div>
+                <p className="text-emerald-700 font-semibold text-sm sm:text-base">
+                  Avaliação salva com sucesso!
+                </p>
+                <p className="text-xs sm:text-sm text-emerald-600">
+                  O sistema será otimizado para sua próxima revisão
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
         {!isSubmitted && selectedScore !== null && (
-          <div className="text-center text-sm text-gray-600">
-            <p>
-              <span className="font-medium">Nota {selectedScore}:</span>{' '}
+          <div className="text-center">
+            <p className="text-sm sm:text-base text-gray-700">
+              <span className="font-semibold text-emerald-600">Nota {selectedScore}:</span>{' '}
               {scores.find(s => s.value === selectedScore)?.label}
             </p>
-            <p className="mt-1">
-              Esta avaliação ajudará o sistema a programar suas revisões.
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              Clique em "Confirmar" para registrar sua avaliação
             </p>
           </div>
         )}
 
         {progress !== null && !isSubmitted && selectedScore === null && (
-          <div className="text-center text-sm text-emerald-600">
-            <p className="font-medium">Última avaliação: {progress}/5</p>
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+              <p className="text-sm sm:text-base text-blue-700">
+                <span className="font-semibold">Última avaliação:</span> {progress}/5
+              </p>
+            </div>
           </div>
         )}
       </div>
 
       {/* Legenda */}
       <div className="pt-6 border-t border-gray-200">
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-gray-200 rounded"></div>
-            <span>0-1: Revisar urgentemente</span>
+        <p className="text-xs sm:text-sm text-gray-600 text-center font-medium mb-3">
+          Guia de Desempenho
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="w-3 h-3 bg-gray-300 rounded mt-0.5 flex-shrink-0"></div>
+            <div className="text-xs sm:text-sm">
+              <div className="font-medium text-gray-900">0-1: Revisar Urgente</div>
+              <div className="text-gray-600">Conceito não consolidado</div>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-yellow-200 rounded"></div>
-            <span>2-3: Revisar em breve</span>
+          <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div className="w-3 h-3 bg-yellow-300 rounded mt-0.5 flex-shrink-0"></div>
+            <div className="text-xs sm:text-sm">
+              <div className="font-medium text-gray-900">2-3: Revisar em Breve</div>
+              <div className="text-gray-600">Conhecimento básico adquirido</div>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-emerald-200 rounded"></div>
-            <span>4-5: Domínio consolidado</span>
+          <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="w-3 h-3 bg-emerald-300 rounded mt-0.5 flex-shrink-0"></div>
+            <div className="text-xs sm:text-sm">
+              <div className="font-medium text-gray-900">4-5: Dominado</div>
+              <div className="text-gray-600">Tópico bem consolidado</div>
+            </div>
           </div>
         </div>
       </div>

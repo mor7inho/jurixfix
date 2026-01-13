@@ -6,6 +6,10 @@
     --foreground: 222.2 84% 4.9%;
   }
 
+  html {
+    /* scroll-behavior removido para evitar pulo ao filtrar */
+  }
+
   body {
     @apply bg-gray-50;
   }

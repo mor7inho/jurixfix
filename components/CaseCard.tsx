@@ -17,12 +17,14 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(`case-progress-${caseData.code}`);
-    if (saved) {
-      setProgress(parseInt(saved, 10));
-    }
+    // Lê ratings do novo formato (jurisfix-ratings)
+    const savedRatings = localStorage.getItem('jurisfix-ratings');
+    const ratings = savedRatings ? JSON.parse(savedRatings) : {};
+    
+    const progressValue = ratings[caseData.slug] ?? null;
+    setProgress(progressValue);
     setMounted(true);
-  }, [caseData.code]);
+  }, [caseData.slug]);
 
   if (!mounted) {
     return null;
@@ -39,27 +41,54 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
   return (
     <Link href={`/case/${caseData.slug}`}>
       <div className={cn(
-        "group bg-white rounded-xl border-2 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer",
+        "group bg-white rounded-xl border-2 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer relative",
         getBorderColor(),
         progress !== null && 'shadow-md'
       )}>
-        <div className="flex items-start justify-between mb-4">
+        {/* Badge de Status - Canto Superior Direito */}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+          {progress !== null ? (
+            <>
+              {/* Badge de Status */}
+              <div className={cn(
+                "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap",
+                progress >= 4
+                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                  : progress >= 1
+                  ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                  : "bg-gray-100 text-gray-700 border border-gray-200"
+              )}>
+                {progress >= 4 && "✅ Dominado"}
+                {progress >= 1 && progress < 4 && "🔄 Em Revisão"}
+                {progress === 0 && "📋 Novo"}
+              </div>
+              {/* Nota Numérica */}
+              <div className={cn(
+                "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-bold",
+                progress >= 4
+                  ? "bg-emerald-50 text-emerald-600"
+                  : progress >= 3
+                  ? "bg-yellow-50 text-yellow-600"
+                  : progress >= 2
+                  ? "bg-orange-50 text-orange-600"
+                  : "bg-red-50 text-red-600"
+              )}>
+                ⭐ {progress}/5
+              </div>
+            </>
+          ) : (
+            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap bg-blue-100 text-blue-700 border border-blue-200">
+              🆕 Novo
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-start justify-between mb-4 pr-40">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
                 {caseData.code}
               </span>
-              {progress !== null && (
-                <span className={cn(
-                  "text-xs font-bold px-2 py-1 rounded-full",
-                  progress >= 4 ? "bg-emerald-100 text-emerald-700" :
-                  progress >= 3 ? "bg-yellow-100 text-yellow-700" :
-                  progress >= 2 ? "bg-orange-100 text-orange-700" :
-                  "bg-red-100 text-red-700"
-                )}>
-                  {progress}/5
-                </span>
-              )}
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mt-2 group-hover:text-emerald-700">
               {caseData.title}

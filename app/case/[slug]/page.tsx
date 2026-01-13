@@ -1,13 +1,12 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 import MemorizationButtons from '@/components/MemorizationButtons';
 import CaseNavigation from '@/components/CaseNavigation';
+import CustomMarkdown from '@/components/CustomMarkdown';
 import { getPreviousCase, getNextCase } from '@/lib/caseNavigation';
-import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap, Brain } from 'lucide-react';
 import Link from 'next/link';
 
 interface PageProps {
@@ -117,11 +116,7 @@ export default async function CasePage({ params }: PageProps) {
                 <p className="text-xs sm:text-sm text-gray-600">História ilustrativa</p>
               </div>
             </div>
-            <div className="prose prose-sm sm:prose-lg max-w-none overflow-hidden">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {caseItem.narrativeMd}
-              </ReactMarkdown>
-            </div>
+            <CustomMarkdown content={caseItem.narrativeMd} className="overflow-hidden" />
           </section>
 
           {/* Conflito */}
@@ -153,11 +148,7 @@ export default async function CasePage({ params }: PageProps) {
                 <p className="text-xs sm:text-sm text-gray-600">Fundamentos doutrinários</p>
               </div>
             </div>
-            <div className="prose prose-sm sm:prose-lg max-w-none overflow-hidden">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {caseItem.explanationMd}
-              </ReactMarkdown>
-            </div>
+            <CustomMarkdown content={caseItem.explanationMd} className="overflow-hidden" />
           </section>
 
           {/* Aplicação */}
@@ -171,11 +162,7 @@ export default async function CasePage({ params }: PageProps) {
                 <p className="text-xs sm:text-sm text-gray-600">Como aplicar</p>
               </div>
             </div>
-            <div className="prose prose-sm sm:prose-lg max-w-none overflow-hidden">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {caseItem.applicationMd}
-              </ReactMarkdown>
-            </div>
+            <CustomMarkdown content={caseItem.applicationMd} className="overflow-hidden" />
           </section>
 
           {/* Ideia Chave */}
@@ -237,13 +224,16 @@ export default async function CasePage({ params }: PageProps) {
           </section>
 
           {/* Botões de Memorização */}
-          <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200">
+          <section className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-emerald-200 shadow-md">
             <div className="text-center mb-6 sm:mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-emerald-100 rounded-full mb-4">
+                <Brain className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
+              </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 Sistema de Memorização
               </h3>
               <p className="text-sm sm:text-base text-gray-600">
-                Avalie seu nível de compreensão
+                Avalie seu nível de compreensão e o sistema calculará quando revisar
               </p>
             </div>
             <MemorizationButtons caseId={caseItem.code} />
