@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Brain, Check } from 'lucide-react';
+import { useProgress } from '@/hooks/useProgress';
 
 interface MemorizationButtonsProps {
   caseId: string;
 }
 
 const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
+  const { progress, saveProgress, mounted } = useProgress(caseId);
   const [selectedScore, setSelectedScore] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -22,15 +24,12 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
   ];
 
   const handleScoreClick = (score: number) => {
-    if (!isSubmitted) {
-      setSelectedScore(score);
-    }
+    setSelectedScore(score);
   };
 
   const handleSubmit = () => {
     if (selectedScore !== null) {
-      // Aqui você implementaria a lógica para salvar no backend
-      console.log(`Salvando avaliação: Caso ${caseId}, Nota ${selectedScore}`);
+      saveProgress(selectedScore);
       setIsSubmitted(true);
       
       // Reset após 2 segundos
@@ -40,6 +39,10 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
       }, 2000);
     }
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -53,6 +56,8 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
               "hover:scale-[1.02] active:scale-[0.98]",
               selectedScore === score.value
                 ? "border-emerald-500 shadow-lg transform scale-[1.02]"
+                : progress === score.value
+                ? "border-emerald-400 shadow-lg"
                 : "border-gray-200 hover:border-gray-300",
               score.color
             )}
@@ -60,6 +65,9 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
           >
             <div className="text-2xl font-bold mb-2">{score.value}</div>
             <div className="text-sm font-medium">{score.label}</div>
+            {progress === score.value && (
+              <Check className="w-4 h-4 absolute mt-6 text-emerald-600" />
+            )}
           </button>
         ))}
       </div>
@@ -108,6 +116,12 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
             <p className="mt-1">
               Esta avaliação ajudará o sistema a programar suas revisões.
             </p>
+          </div>
+        )}
+
+        {progress !== null && !isSubmitted && selectedScore === null && (
+          <div className="text-center text-sm text-emerald-600">
+            <p className="font-medium">Última avaliação: {progress}/5</p>
           </div>
         )}
       </div>

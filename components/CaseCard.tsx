@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronRight, Clock, Tag, Award } from 'lucide-react';
 import { Case } from '@/types/case';
 import { cn, getPriorityColor, getLevelText } from '@/lib/utils';
@@ -13,15 +13,54 @@ interface CaseCardProps {
 const CaseCard = ({ caseData }: CaseCardProps) => {
   const priorityColor = getPriorityColor(caseData.priority);
   const levelInfo = getLevelText(caseData.level);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`case-progress-${caseData.code}`);
+    if (saved) {
+      setProgress(parseInt(saved, 10));
+    }
+    setMounted(true);
+  }, [caseData.code]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  // Determinar cor da borda baseado na nota
+  const getBorderColor = () => {
+    if (progress === null) return 'border-gray-200';
+    if (progress >= 4) return 'border-emerald-400';
+    if (progress >= 3) return 'border-yellow-300';
+    return 'border-gray-200';
+  };
 
   return (
     <Link href={`/case/${caseData.slug}`}>
-      <div className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-emerald-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
+      <div className={cn(
+        "group bg-white rounded-xl border-2 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer",
+        getBorderColor(),
+        progress !== null && 'shadow-md'
+      )}>
         <div className="flex items-start justify-between mb-4">
-          <div>
-            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              {caseData.code}
-            </span>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {caseData.code}
+              </span>
+              {progress !== null && (
+                <span className={cn(
+                  "text-xs font-bold px-2 py-1 rounded-full",
+                  progress >= 4 ? "bg-emerald-100 text-emerald-700" :
+                  progress >= 3 ? "bg-yellow-100 text-yellow-700" :
+                  progress >= 2 ? "bg-orange-100 text-orange-700" :
+                  "bg-red-100 text-red-700"
+                )}>
+                  {progress}/5
+                </span>
+              )}
+            </div>
             <h3 className="text-lg font-semibold text-gray-900 mt-2 group-hover:text-emerald-700">
               {caseData.title}
             </h3>
@@ -29,7 +68,7 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
               {caseData.topic}
             </p>
           </div>
-          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
         </div>
 
         <div className="mb-4">
