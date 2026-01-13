@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Brain, Check } from 'lucide-react';
 import { useProgress } from '@/hooks/useProgress';
@@ -31,6 +32,24 @@ const MemorizationButtons = ({ caseId }: MemorizationButtonsProps) => {
     if (selectedScore !== null) {
       saveProgress(selectedScore);
       setIsSubmitted(true);
+      
+      // Determinar mensagem dinâmica baseada na nota
+      const scoreMessages = {
+        0: { title: 'Não entendi', desc: 'Estude novamente em breve' },
+        1: { title: 'Muito confuso', desc: 'Revisão urgente necessária' },
+        2: { title: 'Confuso', desc: 'Revise os conceitos principais' },
+        3: { title: 'Entendi o básico', desc: 'Pratique mais aplicações' },
+        4: { title: 'Entendi bem', desc: 'Ótimo progresso, continue assim!' },
+        5: { title: 'Dominei totalmente', desc: 'Parabéns, você dominou este tópico!' }
+      };
+      
+      const message = scoreMessages[selectedScore as keyof typeof scoreMessages];
+      
+      // Mostrar toast de sucesso com mensagem dinâmica
+      toast.success(`${message.title} - Nota ${selectedScore}/5`, {
+        description: message.desc,
+        duration: 3000,
+      });
       
       // Reset após 2 segundos
       setTimeout(() => {

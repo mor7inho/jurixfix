@@ -5,6 +5,8 @@ import remarkGfm from 'remark-gfm';
 import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 import MemorizationButtons from '@/components/MemorizationButtons';
+import CaseNavigation from '@/components/CaseNavigation';
+import { getPreviousCase, getNextCase } from '@/lib/caseNavigation';
 import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap } from 'lucide-react';
 import Link from 'next/link';
 
@@ -246,6 +248,13 @@ export default async function CasePage({ params }: PageProps) {
             </div>
             <MemorizationButtons caseId={caseItem.code} />
           </section>
+
+          {/* Navegação entre Casos */}
+          <CaseNavigation 
+            slug={slug}
+            previousCase={getPreviousCase(slug)}
+            nextCase={getNextCase(slug)}
+          />
         </div>
       </main>
     </div>

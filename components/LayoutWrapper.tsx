@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
+import UserHeader from './UserHeader';
 import { Menu, X } from 'lucide-react';
 
 interface LayoutWrapperProps {
@@ -77,7 +78,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
       {/* Main content */}
       <main className="flex-1 min-h-screen w-full overflow-y-auto">
-        {/* Header com botão de toggle */}
+        {/* Header com botão de toggle e usuário */}
         <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <button
             onClick={toggleSidebar}
@@ -90,10 +91,10 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
               <Menu className="w-6 h-6 text-gray-900" />
             )}
           </button>
-          <div className="flex-1 md:flex-none text-center md:text-left">
+          <div className="flex-1 text-center md:text-left">
             <h1 className="text-lg font-semibold text-gray-900">JurisFix</h1>
           </div>
-          <div className="w-10" />
+          <UserHeader />
         </div>
 
         {/* Conteúdo da página */}
