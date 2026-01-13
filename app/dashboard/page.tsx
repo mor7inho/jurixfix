@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import CaseCard from '@/components/CaseCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
@@ -8,12 +9,63 @@ import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const cases = caseData.cases as Case[];
+  
   const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [appliedDiscipline, setAppliedDiscipline] = useState<string | null>(null);
   const [appliedTopics, setAppliedTopics] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  // Load filters from URL on mount
+  useEffect(() => {
+    const disciplineParam = searchParams.get('discipline');
+    const topicsParam = searchParams.get('topics');
+    const searchParam = searchParams.get('search');
+
+    if (disciplineParam) {
+      setSelectedDiscipline(disciplineParam);
+      setAppliedDiscipline(disciplineParam);
+    }
+
+    if (topicsParam) {
+      const topicsList = topicsParam.split(',').filter(Boolean);
+      setSelectedTopics(topicsList);
+      setAppliedTopics(topicsList);
+    }
+
+    if (searchParam) {
+      setSearchTerm(decodeURIComponent(searchParam));
+    }
+
+    setMounted(true);
+  }, [searchParams]);
+
+  // Update URL when filters change
+  useEffect(() => {
+    if (!mounted) return;
+
+    const params = new URLSearchParams();
+
+    if (appliedDiscipline) {
+      params.set('discipline', appliedDiscipline);
+    }
+
+    if (appliedTopics.length > 0) {
+      params.set('topics', appliedTopics.join(','));
+    }
+
+    if (searchTerm) {
+      params.set('search', encodeURIComponent(searchTerm));
+    }
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/dashboard?${queryString}` : '/dashboard';
+    router.push(newUrl);
+  }, [appliedDiscipline, appliedTopics, searchTerm, mounted, router]);
 
   // Extract unique disciplines
   const disciplines = useMemo(() => {
@@ -76,6 +128,10 @@ export default function DashboardPage() {
     setAppliedTopics([]);
     setSearchTerm('');
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="p-4 md:p-8 w-full">
