@@ -25,28 +25,6 @@ export const revalidate = 3600;
 // Outras são geradas on-demand na primeira requisição
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  try {
-    // Gerar apenas os top 100 casos mais populares/prioritários
-    const topCases = await prisma.case.findMany({
-      where: { isPublished: true },
-      select: { slug: true },
-      orderBy: [
-        { priority: 'desc' },
-        { level: 'asc' },
-      ],
-      take: 100,
-    });
-    
-    return topCases.map((caseItem) => ({
-      slug: caseItem.slug,
-    }));
-  } catch (error) {
-    console.error('Erro ao gerar static params:', error);
-    return [];
-  }
-}
-
 export default async function CasePage({ params }: PageProps) {
   const { slug } = await params;
   
