@@ -11,7 +11,7 @@ export default function ProgressBar({ cases }: ProgressBarProps) {
   const [progress, setProgress] = useState(0);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  const calculateProgress = () => {
     const savedRatings = localStorage.getItem('jurisfix-ratings');
     const ratings = savedRatings ? JSON.parse(savedRatings) : {};
 
@@ -25,8 +25,20 @@ export default function ProgressBar({ cases }: ProgressBarProps) {
 
     const percentage = (dominado / cases.length) * 100;
     setProgress(Math.round(percentage));
+  };
+
+  useEffect(() => {
+    calculateProgress();
     setMounted(true);
-  }, []);
+
+    // Escutar mudanças no localStorage
+    const handleStorageChange = () => {
+      calculateProgress();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [cases]);
 
   if (!mounted) {
     return null;

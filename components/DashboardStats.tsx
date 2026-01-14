@@ -30,12 +30,7 @@ export default function DashboardStats({
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simular carregamento de 500ms
-    const loadingTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
+  const recalculateStats = () => {
     const newStats: Stats = {
       total: cases.length,
       dominado: 0,
@@ -60,10 +55,28 @@ export default function DashboardStats({
     });
 
     setStats(newStats);
+  };
+
+  useEffect(() => {
+    // Simular carregamento de 500ms
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    recalculateStats();
     setMounted(true);
 
-    return () => clearTimeout(loadingTimer);
-  }, []);
+    // Escutar mudanças no localStorage
+    const handleStorageChange = () => {
+      recalculateStats();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      clearTimeout(loadingTimer);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [cases]);
 
   if (!mounted) {
     return null;

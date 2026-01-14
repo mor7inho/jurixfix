@@ -30,7 +30,7 @@ export default function StatusFilterButtons({
   });
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  const recalculateStats = () => {
     const newStats: Stats = {
       dominado: 0,
       revisao: 0,
@@ -54,8 +54,20 @@ export default function StatusFilterButtons({
     });
 
     setStats(newStats);
+  };
+
+  useEffect(() => {
+    recalculateStats();
     setMounted(true);
-  }, []);
+
+    // Escutar mudanças no localStorage
+    const handleStorageChange = () => {
+      recalculateStats();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [cases]);
 
   if (!mounted) {
     return null;
