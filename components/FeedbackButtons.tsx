@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useProgress } from '@/hooks/useProgress';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface FeedbackButtonsProps {
@@ -14,7 +13,6 @@ interface FeedbackButtonsProps {
 const FeedbackButtons = ({ caseId }: FeedbackButtonsProps) => {
   const { saveProgress, mounted } = useProgress(caseId);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
 
   const feedbackOptions = [
     {
@@ -101,9 +99,7 @@ const FeedbackButtons = ({ caseId }: FeedbackButtonsProps) => {
       duration: 2000,
     });
 
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 1000);
+    setIsSubmitting(false);
   };
 
   if (!mounted) {
