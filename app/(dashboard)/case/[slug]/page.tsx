@@ -15,6 +15,9 @@ interface PageProps {
   }>;
 }
 
+// Render case pages dynamically to avoid DB connection during build
+export const dynamic = 'force-dynamic';
+
 // ISR: Revalidar a cada 1 hora
 export const revalidate = 3600;
 

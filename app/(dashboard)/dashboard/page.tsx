@@ -3,6 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import DashboardContent from '@/components/DashboardContent';
 import { Case } from '@/types/case';
 
+// Render dashboard dynamically to avoid DB connection during static build
+export const dynamic = 'force-dynamic';
+
 const prisma = new PrismaClient();
 
 function DashboardLoadingFallback() {
