@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, BookOpen } from 'lucide-react';
 import { Case } from '@/types/case';
-import caseData from '@/data/cases.json';
 import { cn } from '@/lib/utils';
 import { FilterStatus } from '@/hooks/useFilteredCases';
 
 interface StatusFilterButtonsProps {
+  cases: Case[];
   selectedStatus: FilterStatus | null;
   onStatusChange: (status: FilterStatus | null) => void;
 }
@@ -19,6 +19,7 @@ interface Stats {
 }
 
 export default function StatusFilterButtons({
+  cases,
   selectedStatus,
   onStatusChange,
 }: StatusFilterButtonsProps) {
@@ -30,7 +31,6 @@ export default function StatusFilterButtons({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const cases = caseData.cases as Case[];
     const newStats: Stats = {
       dominado: 0,
       revisao: 0,
@@ -104,7 +104,7 @@ export default function StatusFilterButtons({
               : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
           )}
         >
-          Todos ({caseData.cases.length})
+          Todos ({cases.length})
         </button>
 
         {/* Botões de Status */}

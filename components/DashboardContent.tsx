@@ -9,13 +9,16 @@ import SearchBar from '@/components/SearchBar';
 import StatusFilterButtons from '@/components/StatusFilterButtons';
 import ProgressBar from '@/components/ProgressBar';
 import { useFilteredCases, FilterStatus } from '@/hooks/useFilteredCases';
-import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
 
-export default function DashboardContent() {
+interface DashboardContentProps {
+  initialCases: Case[];
+}
+
+export default function DashboardContent({ initialCases }: DashboardContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const cases = caseData.cases as Case[];
+  const cases = initialCases || [];
   const scrollPositionRef = useRef<number>(0);
   
   const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(null);
@@ -131,10 +134,12 @@ export default function DashboardContent() {
   const disciplines = useMemo(() => {
     const uniqueDisciplines = new Set<string>();
     cases.forEach((caseItem) => {
-      uniqueDisciplines.add(caseData.discipline.name);
+      if (caseItem.category) {
+        uniqueDisciplines.add(caseItem.category);
+      }
     });
     return Array.from(uniqueDisciplines).sort();
-  }, []);
+  }, [cases]);
 
   // Get topics for selected discipline (and category if selected)
   const topics = useMemo(() => {
@@ -147,7 +152,7 @@ export default function DashboardContent() {
       uniqueTopics.add(caseItem.topic);
     });
     return Array.from(uniqueTopics).sort();
-  }, [selectedCategory]);
+  }, [selectedCategory, cases]);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -158,13 +163,13 @@ export default function DashboardContent() {
       }
     });
     return Array.from(uniqueCategories).sort();
-  }, []);
+  }, [cases]);
 
   // Filter cases based on discipline, topics, category, and search term
   const filteredCases = useMemo(() => {
     let result = cases.filter((caseItem) => {
-      // Filter by discipline
-      if (appliedDiscipline && caseData.discipline.name !== appliedDiscipline) {
+      // Filter by discipline (using category since that's what we store now)
+      if (appliedDiscipline && caseItem.category !== appliedDiscipline) {
         return false;
       }
 
@@ -237,7 +242,7 @@ export default function DashboardContent() {
     }
 
     return result;
-  }, [appliedDiscipline, appliedTopics, appliedCategory, searchTerm, appliedStatus, appliedSort]);
+  }, [appliedDiscipline, appliedTopics, appliedCategory, searchTerm, appliedStatus, appliedSort, cases]);
 
   const handleApplyFilters = () => {
     setAppliedDiscipline(selectedDiscipline);
@@ -289,12 +294,12 @@ export default function DashboardContent() {
             Dashboard
           </h1>
           <p className="text-gray-600 text-sm sm:text-base">
-            {caseData.discipline.name} • {caseData.module.name}
+            Direito Administrativo • Jurisprudência
           </p>
         </div>
         
         {/* Barra de Progresso Fina */}
-        <ProgressBar />
+        <ProgressBar cases={cases} />
         
         {/* Busca */}
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
@@ -302,6 +307,7 @@ export default function DashboardContent() {
 
       {/* Filtros de Status */}
       <StatusFilterButtons
+        cases={cases}
         selectedStatus={appliedStatus}
         onStatusChange={setAppliedStatus}
       />

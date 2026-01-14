@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { Case } from '@/types/case';
-import caseData from '@/data/cases.json';
 
-export default function ProgressBar() {
+interface ProgressBarProps {
+  cases: Case[];
+}
+
+export default function ProgressBar({ cases }: ProgressBarProps) {
   const [progress, setProgress] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const cases = caseData.cases as Case[];
     const savedRatings = localStorage.getItem('jurisfix-ratings');
     const ratings = savedRatings ? JSON.parse(savedRatings) : {};
 

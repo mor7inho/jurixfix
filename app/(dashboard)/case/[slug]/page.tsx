@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client';
 import FeedbackButtons from '@/components/FeedbackButtons';
 import CaseNavigation from '@/components/CaseNavigation';
 import CustomMarkdown from '@/components/CustomMarkdown';
-import { getPreviousCase, getNextCase } from '@/lib/caseNavigation';
 import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap } from 'lucide-react';
 import Link from 'next/link';
 
@@ -63,9 +62,48 @@ export default async function CasePage({ params }: PageProps) {
     notFound();
   }
 
-  if (!caseItem) {
-    notFound();
-  }
+  // Buscar casos anterior e próximo
+  const allCases = await prisma.case.findMany({
+    where: { isPublished: true },
+    orderBy: [
+      { priority: 'desc' },
+      { level: 'asc' },
+      { createdAt: 'asc' },
+    ],
+  });
+
+  const currentIndex = allCases.findIndex((c) => c.slug === slug);
+  const previousCaseData = currentIndex > 0 ? allCases[currentIndex - 1] : null;
+  const nextCaseData = currentIndex >= 0 && currentIndex < allCases.length - 1 ? allCases[currentIndex + 1] : null;
+
+  // Converter para formato esperado pelo CaseNavigation
+  const previousCase = previousCaseData ? ({
+    slug: previousCaseData.slug,
+    code: previousCaseData.code,
+    title: previousCaseData.title,
+    topic: previousCaseData.topic,
+    level: previousCaseData.level,
+    priority: previousCaseData.priority as 'alta' | 'altissima' | 'media' | 'baixa',
+    simpleEmenda: previousCaseData.simpleEmenda,
+    narrativeMd: previousCaseData.narrativeMd,
+    conflict: previousCaseData.conflict,
+    explanationMd: previousCaseData.explanationMd,
+    applicationMd: previousCaseData.applicationMd,
+  } as any) : null;
+
+  const nextCase = nextCaseData ? ({
+    slug: nextCaseData.slug,
+    code: nextCaseData.code,
+    title: nextCaseData.title,
+    topic: nextCaseData.topic,
+    level: nextCaseData.level,
+    priority: nextCaseData.priority as 'alta' | 'altissima' | 'media' | 'baixa',
+    simpleEmenda: nextCaseData.simpleEmenda,
+    narrativeMd: nextCaseData.narrativeMd,
+    conflict: nextCaseData.conflict,
+    explanationMd: nextCaseData.explanationMd,
+    applicationMd: nextCaseData.applicationMd,
+  } as any) : null;
 
   const levelInfo = {
     1: { text: 'Iniciante', color: 'bg-blue-100 text-blue-800' },
@@ -271,8 +309,8 @@ export default async function CasePage({ params }: PageProps) {
           {/* Navegação entre Casos */}
           <CaseNavigation 
             slug={slug}
-            previousCase={getPreviousCase(slug)}
-            nextCase={getNextCase(slug)}
+            previousCase={previousCase}
+            nextCase={nextCase}
           />
         </div>
       </main>

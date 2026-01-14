@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, BookOpen, Zap } from 'lucide-react';
 import { Case } from '@/types/case';
-import caseData from '@/data/cases.json';
 import { cn } from '@/lib/utils';
 
 interface DashboardStatsProps {
+  cases: Case[];
   onStatusFilterClick?: (status: 'dominado' | 'revisao' | 'pendente') => void;
 }
 
@@ -18,6 +18,7 @@ interface Stats {
 }
 
 export default function DashboardStats({
+  cases,
   onStatusFilterClick,
 }: DashboardStatsProps) {
   const [stats, setStats] = useState<Stats>({
@@ -35,7 +36,6 @@ export default function DashboardStats({
       setIsLoading(false);
     }, 500);
 
-    const cases = caseData.cases as Case[];
     const newStats: Stats = {
       total: cases.length,
       dominado: 0,
