@@ -3,22 +3,22 @@ export interface Case {
   title: string;
   slug: string;
   topic: string;
-  context: string;
+  context?: string;
   simpleEmenda: string;
-  createdAt: string;
+  createdAt?: string;
   level: number;
   priority: 'altissima' | 'alta' | 'media' | 'baixa';
-  isPublished: boolean;
+  isPublished?: boolean;
   category?: 'administrativo' | 'constitucional' | 'penal' | 'civil' | 'trabalhista' | 'processual' | 'comercial' | 'empresarial' | 'ambiental' | 'internacional' | 'tributário' | 'consumidor' | 'previdenciário' | 'imobiliário' | 'agrário' | 'eleitoral' | 'militar' | 'marítimo' | 'aeronáutico';
   narrativeMd: string;
   conflict: string;
   explanationMd: string;
   applicationMd: string;
-  keyIdea: string;
-  proofTip: string;
-  mnemonics: string[];
-  references: string[];
-  tags: string[];
+  keyIdea?: string;
+  proofTip?: string;
+  mnemonics?: string[];
+  references?: string[];
+  tags?: string[];
 }
 
 export interface Discipline {

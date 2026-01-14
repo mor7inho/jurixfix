@@ -1,24 +1,20 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ChevronRight, Clock, Tag, Award } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Case } from '@/types/case';
-import { cn, getPriorityColor, getLevelText } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import CaseTags from '@/components/CaseTags';
 
 interface CaseCardProps {
   caseData: Case;
 }
 
 const CaseCard = ({ caseData }: CaseCardProps) => {
-  const priorityColor = getPriorityColor(caseData.priority);
-  const levelInfo = getLevelText(caseData.level);
   const [progress, setProgress] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Lê ratings do novo formato (jurisfix-ratings)
     const savedRatings = localStorage.getItem('jurisfix-ratings');
     const ratings = savedRatings ? JSON.parse(savedRatings) : {};
     
@@ -31,134 +27,61 @@ const CaseCard = ({ caseData }: CaseCardProps) => {
     return null;
   }
 
-  // Determinar cor da borda baseado na nota
-  const getBorderColor = () => {
-    if (progress === null) return 'border-gray-200';
-    if (progress >= 4) return 'border-emerald-400';
-    if (progress >= 3) return 'border-yellow-300';
-    return 'border-gray-200';
+  // Cor da borda esquerda baseada no progresso
+  const getBorderLeftColor = () => {
+    if (progress === null) return 'border-l-slate-200';
+    if (progress >= 4) return 'border-l-emerald-500';
+    if (progress >= 1) return 'border-l-amber-500';
+    return 'border-l-slate-200';
   };
+
+  // Shadow dinâmica
+  const getShadowClass = () => {
+    if (progress === null) return 'shadow-sm hover:shadow-md';
+    if (progress >= 4) return 'shadow-md hover:shadow-lg';
+    if (progress >= 1) return 'shadow-sm hover:shadow-md';
+    return 'shadow-sm hover:shadow-md';
+  };
+
+  // Extrai primeiras 2 tags (se disponíveis)
+  const displayTags = caseData.tags?.slice(0, 2) || [];
 
   return (
     <Link href={`/case/${caseData.slug}`}>
       <div className={cn(
-        "group bg-white rounded-xl border-2 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer relative",
-        getBorderColor(),
-        progress !== null && 'shadow-md'
+        "group bg-white rounded-lg border border-slate-200 border-l-4 p-6 transition-all duration-300 cursor-pointer flex flex-col h-full",
+        getBorderLeftColor(),
+        getShadowClass()
       )}>
-        {/* Badge de Tópico - Canto Superior Esquerdo */}
-        <div className="absolute top-4 left-4">
-          <div className={cn(
-            "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap border",
-            "bg-indigo-100 text-indigo-800 border-indigo-200"
-          )}>
+        {/* Topo: Tag de Tópico Discreta */}
+        <div className="mb-4">
+          <span className="text-xs font-light tracking-widest text-slate-500 uppercase">
             {caseData.topic}
-          </div>
+          </span>
         </div>
 
-        {/* Badge de Status - Canto Superior Direito */}
-        <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-          {progress !== null ? (
-            <>
-              {/* Badge de Status */}
-              <div className={cn(
-                "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap",
-                progress >= 4
-                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                  : progress >= 1
-                  ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
-                  : "bg-gray-100 text-gray-700 border border-gray-200"
-              )}>
-                {progress >= 4 && "✅ Dominado"}
-                {progress >= 1 && progress < 4 && "🔄 Em Revisão"}
-                {progress === 0 && "📋 Novo"}
-              </div>
-              {/* Nota Numérica */}
-              <div className={cn(
-                "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-bold",
-                progress >= 4
-                  ? "bg-emerald-50 text-emerald-600"
-                  : progress >= 3
-                  ? "bg-yellow-50 text-yellow-600"
-                  : progress >= 2
-                  ? "bg-orange-50 text-orange-600"
-                  : "bg-red-50 text-red-600"
-              )}>
-                ⭐ {progress}/5
-              </div>
-            </>
-          ) : (
-            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap bg-blue-100 text-blue-700 border border-blue-200">
-              🆕 Novo
-            </div>
-          )}
+        {/* Centro: Título com Destaque Total */}
+        <div className="flex items-start justify-between gap-3 mb-5 flex-1">
+          <h3 className="text-xl font-bold text-slate-900 group-hover:text-teal-600 line-clamp-3 transition-colors leading-tight">
+            {caseData.title}
+          </h3>
+          <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-teal-500 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" />
         </div>
 
-        <div className={cn(
-          "flex items-start justify-between mb-4 pr-40",
-          caseData.category && "pl-40 sm:pl-0"
-        )}>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {caseData.code}
+        {/* Base: 2 Tags em Formato Pílula Minimalista */}
+        {displayTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
+            {displayTags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                {tag}
               </span>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mt-2 group-hover:text-emerald-700">
-              {caseData.title}
-            </h3>
-            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-              {caseData.topic}
-            </p>
+            ))}
           </div>
-          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-        </div>
+        )}
 
-        <div className="mb-4">
-          <p className="text-sm text-gray-700 line-clamp-3">
-            {caseData.conflict}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className={cn(
-            "text-xs font-medium px-3 py-1 rounded-full border",
-            levelInfo.color
-          )}>
-            {levelInfo.text}
-          </span>
-          <span className={cn(
-            "text-xs font-medium px-3 py-1 rounded-full border",
-            priorityColor
-          )}>
-            {caseData.priority === 'altissima' ? 'Altíssima' : 
-             caseData.priority === 'alta' ? 'Alta' :
-             caseData.priority === 'media' ? 'Média' : 'Baixa'} Prioridade
-          </span>
-        </div>
-
-        {/* Tags Component */}
-        <div className="mb-4">
-          <CaseTags tags={caseData.tags} maxTags={2} />
-        </div>
-
-        <div className="flex flex-col gap-2 text-xs text-gray-500 pt-4 border-t border-gray-100">
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <div className="flex items-center gap-1 min-w-0">
-              <Clock className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{caseData.createdAt}</span>
-            </div>
-            <span className="text-gray-300 hidden sm:inline">•</span>
-            <div className="flex items-center gap-1 min-w-0 sm:flex-1">
-              <Tag className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate text-xs">{caseData.context}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 min-w-0">
-            <Award className="w-3 h-3 flex-shrink-0" />
-            <span className="font-medium truncate text-xs">Emenda: {caseData.simpleEmenda}</span>
-          </div>
-        </div>
       </div>
     </Link>
   );

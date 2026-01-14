@@ -1,0 +1,267 @@
+Vou analisar o material de Direito Administrativo fornecido e gerar os casos narrativos em JSON conforme as especificações do JurisFix.
+
+```json
+{
+  "discipline": {
+    "name": "Direito Administrativo",
+    "slug": "direito-administrativo"
+  },
+  "module": {
+    "name": "Regime Jurídico Administrativo e Princípios",
+    "slug": "regime-juridico-e-principios",
+    "order": 1
+  },
+  "cases": [
+    {
+      "id": "da-rja-001",
+      "code": "DA-M01-C001",
+      "title": "Distinção entre Regime de Direito Público e Privado",
+      "slug": "distincao-regime-publico-privado",
+      "axis": "Organização Administrativa",
+      "topic": "Regime Jurídico Administrativo",
+      "subtopics": ["Regime de Direito Público", "Regime de Direito Privado", "Prerrogativas e Sujeições"],
+      "context": "Prefeitura Municipal - Análise de modalidades contratuais",
+      "origin": {
+        "source": "Material Base - Regime Jurídico",
+        "concurso": "Diversos",
+        "year": 2024
+      },
+      "level": 1,
+      "priority": "alta",
+      "characters": ["Procurador municipal", "Secretário de obras"],
+      "narrativeMd": "O procurador municipal analisa dois contratos da Secretaria de Obras: um contrato administrativo para pavimentação de vias públicas e um contrato de locação de imóvel para depósito de materiais. No primeiro, a Prefeitura incluiu cláusula permitindo alteração unilateral das especificações técnicas. No segundo, pretende incluir a mesma prerrogativa. O secretário questiona se ambos os contratos admitem tal cláusula, considerando que um envolve obra pública e outro é locação comercial comum.",
+      "conflict": "Identificar qual regime jurídico se aplica a cada contrato e as consequências práticas",
+      "theoryMap": [
+        "Regime de direito público: conjunto de normas com supremacia e indisponibilidade dos direitos fundamentais",
+        "Estado goza de poderes especiais: impor obrigações, aplicar sanções, intervir na propriedade",
+        "Estado submete-se a obrigações especiais (sujeições): licitação, concurso público",
+        "Regime de direito privado: relações individuais, sem prerrogativas públicas, igualdade (horizontalidade)",
+        "Contratos administrativos: regime público, alterações unilaterais possíveis",
+        "Contratos entre particulares: alterações exigem concordância mútua",
+        "Administração pode submeter-se a ambos os regimes conforme a necessidade",
+        "Mesmo em modelos privatísticos, nunca há submissão integral ao direito privado",
+        "Sempre haverá aplicação de alguma regra de direito público"
+      ],
+      "explanationMd": "O contrato de obra pública submete-se ao regime de direito público, conferindo prerrogativas à Administração, como alteração unilateral dentro dos limites legais. Já o contrato de locação, embora firmado pela Administração, segue predominantemente o regime privado, exigindo concordância mútua para alterações. A diferença decorre da finalidade: a obra atende diretamente o interesse público, justificando a supremacia; a locação é relação patrimonial comum, sem necessidade de poderes especiais.",
+      "applicationMd": "Em provas, apresentam-se dois contratos da Administração, questionando quais admitem cláusulas exorbitantes. O candidato deve identificar que contratos administrativos (obras, serviços públicos) permitem prerrogativas, enquanto contratos meramente patrimoniais (locação, seguro) seguem regime privado predominante. A pegadinha comum é afirmar que toda relação da Administração tem cláusulas exorbitantes.",
+      "simpleEmenda": "Administração submete-se a regime público (com prerrogativas) ou privado (sem prerrogativas) conforme a atividade. Contratos administrativos permitem alteração unilateral; contratos privados da Administração exigem concordância mútua.",
+      "conceptCore": "A Administração atua sob regime público quando exerce função pública típica (supremacia necessária) e sob regime privado quando age como particular (igualdade). Mesmo no segundo caso, regras públicas mínimas sempre se aplicam.",
+      "keyIdea": "Regime público = poderes + limites. Regime privado da Administração = igualdade + controles mínimos.",
+      "proofTip": "Bancas induzem ao erro ao afirmar que TODA atuação da Administração tem cláusulas exorbitantes. Contratos meramente patrimoniais seguem regime privado predominante.",
+      "mnemonics": [],
+      "prerequisites": [],
+      "nextTopics": ["Regime Jurídico Administrativo - Prerrogativas e Sujeições"],
+      "appearsInEditais": ["TCE-PE", "Diversos concursos"],
+      "srs": {
+        "memoryWeight": 4,
+        "initialIntervalDays": 1
+      },
+      "references": [
+        "Justen Filho, 2014, p. 145",
+        "Di Pietro - Regime Jurídico Administrativo"
+      ],
+      "tags": ["regime jurídico", "contratos", "prerrogativas", "direito público", "direito privado"]
+    },
+    {
+      "id": "da-rja-002",
+      "code": "DA-M01-C002",
+      "title": "Prerrogativas e Sujeições do Regime Administrativo",
+      "slug": "prerrogativas-sujeicoes-regime",
+      "axis": "Organização Administrativa",
+      "topic": "Regime Jurídico Administrativo",
+      "subtopics": ["Prerrogativas", "Sujeições", "Supremacia do Interesse Público", "Indisponibilidade"],
+      "context": "Autarquia Federal - Aquisição de equipamentos",
+      "origin": {
+        "source": "Material Base - Regime Jurídico",
+        "concurso": "Diversos",
+        "year": 2024
+      },
+      "level": 2,
+      "priority": "alta",
+      "characters": ["Presidente da autarquia", "Assessor jurídico"],
+      "narrativeMd": "O presidente de uma autarquia federal identifica fornecedor que oferece equipamento essencial por preço 30% inferior ao mercado, com entrega imediata. Propõe contratação direta para economizar recursos e agilizar o serviço. O assessor jurídico explica que, embora a autarquia tenha poderes para adquirir bens e gerir seu orçamento (prerrogativas), está obrigada a realizar licitação pública (sujeição), sob pena de nulidade do ato e responsabilização. O presidente questiona por que a autarquia, tendo autonomia, não pode escolher livremente.",
+      "conflict": "Compreender que prerrogativas e sujeições coexistem no regime administrativo",
+      "theoryMap": [
+        "Regime jurídico administrativo resume-se em prerrogativas e sujeições",
+        "Prerrogativas: privilégios para a Administração nas relações com particulares, visando benefício coletivo",
+        "Exemplos de prerrogativas: desconhecidas no direito privado, colocam Administração em superioridade",
+        "Sujeições/restrições: retiram ou diminuem liberdade da Administração comparada ao particular",
+        "Violação de sujeição: nulidade do ato + responsabilidade da autoridade",
+        "Exemplos de sujeições: concurso público, licitação",
+        "Prerrogativas traduzem-se no princípio da supremacia do interesse público",
+        "Sujeições traduzem-se no princípio da indisponibilidade do interesse público",
+        "Regime administrativo: prerrogativas para alcançar finalidade pública + sujeições para preservar direitos fundamentais e patrimônio público"
+      ],
+      "explanationMd": "A autarquia possui prerrogativas (gerir orçamento, adquirir bens, firmar contratos) que particulares não têm, mas está submetida a restrições (licitação obrigatória) que limitam sua liberdade. Essa aparente contradição é a essência do regime administrativo: poderes especiais para servir ao interesse público + controles rigorosos para evitar desvios. A contratação direta, mesmo economicamente vantajosa, viola a sujeição da licitação, tornando o ato nulo.",
+      "applicationMd": "Questões típicas apresentam gestor público que, invocando eficiência ou economia, pretende dispensar licitação. O erro é ignorar que prerrogativas (poder de contratar) convivem com sujeições (dever de licitar). Bancas exploram o conflito aparente: \"se a Administração tem poder X, por que não pode fazer Y?\". Resposta: porque sujeições limitam prerrogativas.",
+      "simpleEmenda": "Regime administrativo = prerrogativas (poderes especiais) + sujeições (limitações obrigatórias). Prerrogativas servem ao interesse público; sujeições protegem legalidade e direitos fundamentais. Ambas coexistem obrigatoriamente.",
+      "conceptCore": "O regime administrativo equilibra poderes especiais (para efetividade) com controles rígidos (para legalidade). Prerrogativas sem sujeições = arbítrio. Sujeições sem prerrogativas = ineficiência.",
+      "keyIdea": "Administração tem mais poderes e mais limites que particulares. Prerrogativas e sujeições são duas faces da mesma moeda.",
+      "proofTip": "Erro comum: achar que prerrogativas eliminam sujeições. Exemplo: poder de desapropriar não dispensa indenização; poder de contratar não dispensa licitação.",
+      "mnemonics": [],
+      "prerequisites": ["Distinção entre Regime de Direito Público e Privado"],
+      "nextTopics": ["Princípios Administrativos Expressos"],
+      "appearsInEditais": ["Diversos concursos"],
+      "srs": {
+        "memoryWeight": 5,
+        "initialIntervalDays": 1
+      },
+      "references": [
+        "Bandeira de Mello - Regime Jurídico Administrativo",
+        "Di Pietro - Princípios Fundamentais"
+      ],
+      "tags": ["regime administrativo", "prerrogativas", "sujeições", "licitação", "supremacia"]
+    },
+    {
+      "id": "da-pri-001",
+      "code": "DA-M01-C003",
+      "title": "Princípios Expressos e Implícitos - Conceito",
+      "slug": "principios-expressos-implicitos",
+      "axis": "Organização Administrativa",
+      "topic": "Princípios Administrativos",
+      "subtopics": ["Princípios Expressos", "Princípios Implícitos", "CF/88 art. 37", "Lei 9.784/99"],
+      "context": "Tribunal de Contas Estadual - Análise de parecer jurídico",
+      "origin": {
+        "source": "Material Base - Princípios",
+        "concurso": "Diversos",
+        "year": 2024
+      },
+      "level": 1,
+      "priority": "alta",
+      "characters": ["Conselheiro do TCE", "Auditor responsável"],
+      "narrativeMd": "Um conselheiro do TCE analisa parecer que fundamenta irregularidade com base no \"princípio da moralidade administrativa\". Outro parecer, sobre caso similar, invoca o \"princípio do devido processo legal\". O auditor consulta a Constituição Federal e verifica que apenas o primeiro consta expressamente no art. 37, caput. Questiona se o segundo princípio, ausente do texto constitucional, possui validade jurídica para fundamentar a decisão. O conselheiro precisa esclarecer a diferença entre princípios expressos e implícitos e sua aplicabilidade.",
+      "conflict": "Compreender que princípios implícitos têm validade mesmo sem previsão literal na CF",
+      "theoryMap": [
+        "Princípios administrativos: valores, diretrizes, mandamentos gerais que orientam leis, atuação da Administração e condicionam validade dos atos",
+        "Princípios expressos: previstos taxativamente em norma jurídica de caráter geral",
+        "Princípios implícitos (reconhecidos): não constam taxativamente, decorrem de outros princípios, jurisprudência ou doutrina",
+        "Art. 37, CF/88: legalidade, impessoalidade, moralidade, publicidade, eficiência (LIMPE)",
+        "Aplicam-se à administração direta e indireta, todos os Poderes, todas as esferas (União, estados, DF, municípios)",
+        "Princípios expressos em leis: Lei 9.784/99 (processo administrativo federal), Lei 14.133/21 (licitações)",
+        "Princípios implícitos: nome não consta literalmente, mas sentido/aplicação/significado constam na norma",
+        "Exemplo: CF prevê 'devido processo legal' (art. 5º, LIV) sem nomear 'princípio do devido processo legal'",
+        "Não há hierarquia entre princípios",
+        "Conflito aparente: interpretador aplica harmonização para manter unidade do ordenamento"
+      ],
+      "explanationMd": "Moralidade é princípio expresso (CF, art. 37, caput - texto literal). Devido processo legal é implícito (CF, art. 5º, LIV - sentido presente, nome ausente). Ambos têm validade constitucional plena. A distinção expresso/implícito é classificatória, não hierárquica. Princípios implícitos fundamentam decisões com mesma força. O auditor pode invocar ambos legitimamente, pois decorrem da Constituição, ainda que por caminhos diferentes (literalidade vs. construção doutrinária).",
+      "applicationMd": "Bancas questionam se princípio X (implícito) pode fundamentar anulação de ato. Resposta: sim, desde que reconhecido constitucionalmente. Pegadinha: afirmar que apenas princípios expressos vinculam a Administração. Erro: desconsiderar que implícitos têm mesma força. Questões típicas: \"Princípio Y, não previsto no art. 37, não se aplica à Administração\" - ERRADO se Y for reconhecido (ex: devido processo legal, segurança jurídica).",
+      "simpleEmenda": "Princípios expressos: previsão literal em norma. Princípios implícitos: decorrência de outros princípios/jurisprudência/doutrina. Ambos vinculam igualmente a Administração. Não há hierarquia. Classificação depende da referência (CF, lei específica).",
+      "conceptCore": "A força vinculante do princípio decorre de seu fundamento constitucional, não de estar ou não literalmente nomeado. Expresso vs. implícito é distinção didática, não de eficácia jurídica.",
+      "keyIdea": "Princípio expresso = nome literal na norma. Princípio implícito = essência na norma, nome construído. Força jurídica idêntica.",
+      "proofTip": "Não confundir 'implícito' com 'opcional'. Princípios implícitos são obrigatórios e vinculantes. A falta do nome literal não reduz sua aplicabilidade.",
+      "mnemonics": ["LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência"],
+      "prerequisites": ["Regime Jurídico Administrativo"],
+      "nextTopics": ["Princípio da Legalidade"],
+      "appearsInEditais": ["SEGEP 2018", "TRE-BA 2017", "Diversos"],
+      "srs": {
+        "memoryWeight": 3,
+        "initialIntervalDays": 1
+      },
+      "references": [
+        "CF/88, art. 37, caput",
+        "Lei 9.784/99",
+        "Barchet, 2008, p. 34"
+      ],
+      "tags": ["princípios", "expressos", "implícitos", "LIMPE", "hierarquia"]
+    },
+    {
+      "id": "da-pri-002",
+      "code": "DA-M01-C004",
+      "title": "Princípio da Legalidade Administrativa",
+      "slug": "principio-legalidade",
+      "axis": "Organização Administrativa",
+      "topic": "Princípio da Legalidade",
+      "subtopics": ["Estrita Legalidade", "Reserva Legal", "Exceções", "Juridicidade"],
+      "context": "Secretaria Estadual de Educação - Criação de benefício por portaria",
+      "origin": {
+        "source": "Material Base - Princípios",
+        "concurso": "Diversos",
+        "year": 2024
+      },
+      "level": 2,
+      "priority": "alta",
+      "characters": ["Secretário de Educação", "Procurador do estado"],
+      "narrativeMd": "O secretário estadual de Educação, visando motivar professores, edita portaria criando gratificação por desempenho, com critérios e valores definidos internamente. Argumenta que, como gestor, possui autonomia para organizar a pasta e valorizar servidores. O procurador do estado aponta que a portaria é nula: gratificação é vantagem pecuniária que exige lei em sentido estrito. A portaria pode regulamentar lei existente, mas não pode criar direito novo. O secretário questiona a diferença entre sua atuação e a liberdade que cidadãos têm para agir.",
+      "conflict": "Distinguir legalidade administrativa (só o permitido em lei) de legalidade para particulares (tudo exceto o proibido)",
+      "theoryMap": [
+        "Legalidade para administrados (CF, art. 5º, II): ninguém obrigado a fazer/deixar de fazer senão em virtude de lei - tudo não proibido é permitido",
+        "Legalidade administrativa (CF, art. 37, caput): Administração só age quando há previsão legal - princípio da estrita legalidade",
+        "Função administrativa subordina-se a previsões legais: agente atua quando lei determina (vinculação) ou autoriza (discricionariedade)",
+        "Administração obedece à vontade legal; administrados vivem sob autonomia da vontade",
+        "Administração não pode: atuar contra lei (contra legem), além da lei (praeter legem) - só segundo a lei (secundum legem)",
+        "Administrados podem: segundo a lei (secundum legem), além da lei (praeter legem) - não contra lei (contra legem)",
+        "Atuação administrativa conforme decretos regulamentares e atos normativos secundários (portarias, instruções) - não podem inovar, criar direitos/obrigações",
+        "Reserva legal: determinadas matérias exigem lei formal (ordinária/complementar) - ex: individualização de pena (CF, art. 46)",
+        "Exceções à legalidade: medidas provisórias (CF, art. 62), estado de defesa (CF, art. 136), estado de sítio (CF, arts. 137-139)",
+        "Princípio da juridicidade: administrador sujeito a todo ordenamento (leis, regulamentos, princípios) - discricionariedade mais reduzida - ato conforme lei mas contra princípio pode ser anulado"
+      ],
+      "explanationMd": "Particulares agem livremente salvo proibição legal (autonomia da vontade). Administração age apenas quando lei permite ou determina (estrita legalidade). A portaria do secretário inova ao criar gratificação - prerrogativa exclusiva de lei formal. Atos normativos secundários (portaria) apenas regulamentam lei, sem criar direitos/obrigações. A diferença fundamental: particular faz tudo exceto o proibido; administrador faz apenas o autorizado.",
+      "applicationMd": "Questões típicas: gestor cria benefício/restrição por decreto/portaria alegando eficiência. Erro: confundir poder regulamentar (executar lei) com poder de inovar (criar direito). Pegadinha: \"secretário tem competência para organizar a pasta, logo pode criar gratificação\". Resposta: organizar sim, mas criar vantagem pecuniária exige lei. Legalidade administrativa é estrita - ato sem lei é nulo.",
+      "simpleEmenda": "Legalidade para particulares: permitido tudo não proibido. Legalidade administrativa: permitido só o autorizado em lei. Administração age segundo a lei (secundum legem), nunca contra (contra legem) ou além dela (praeter legem). Atos secundários regulamentam, não inovam.",
+      "conceptCore": "A Administração Pública não tem vontade própria - apenas vontade legal. Enquanto particulares são livres dentro da lei, administradores são servos da lei.",
+      "keyIdea": "Particular: tudo, exceto o proibido. Administrador: apenas o permitido. Estrita legalidade = prisão da lei.",
+      "proofTip": "Bancas confundem poder regulamentar com poder de inovar. Decreto/portaria EXECUTA lei existente, jamais cria direito novo. Criar direito = reserva de lei formal.",
+      "mnemonics": [],
+      "prerequisites": ["Princípios Expressos e Implícitos"],
+      "nextTopics": ["Princípio da Impessoalidade"],
+      "appearsInEditais": ["Diversos concursos"],
+      "srs": {
+        "memoryWeight": 5,
+        "initialIntervalDays": 1
+      },
+      "references": [
+        "CF/88, art. 5º, II",
+        "CF/88, art. 37, caput"
+      ],
+      "tags": ["legalidade", "estrita legalidade", "reserva legal", "juridicidade", "atos normativos"]
+    },
+    {
+      "id": "da-pri-003",
+      "code": "DA-M01-C005",
+      "title": "Princípio da Impessoalidade - Cinco Sentidos",
+      "slug": "principio-impessoalidade",
+      "axis": "Organização Administrativa",
+      "topic": "Princípio da Impessoalidade",
+      "subtopics": ["Finalidade", "Agente de Fato", "Isonomia", "Promoção Pessoal", "Impedimento e Suspeição"],
+      "context": "Prefeitura Municipal - Campanha publicitária e processo disciplinar",
+      "origin": {
+        "source": "Material Base - Princípios",
+        "concurso": "Diversos",
+        "year": 2024
+      },
+      "level": 2,
+      "priority": "alta",
+      "characters": ["Prefeito municipal", "Assessor de comunicação", "Procurador-geral"],
+      "narrativeMd": "O prefeito determina que toda publicidade de obras municipais exiba sua foto, nome e slogan político. O assessor questiona se isso viola a Constituição. Paralelamente, o procurador-geral recebe processo administrativo disciplinar contra servidor subordinado direto e nota que a esposa do prefeito é a autoridade julgadora. Simultaneamente, descobre que atos de fiscalização foram assinados por ocupante de cargo efetivo nomeado sem concurso, posteriormente exonerado. Surgem três questões sobre impessoalidade: publicidade pessoal, imparcialidade no julgamento e validade de atos de agente irregular.",
+      "conflict": "Compreender os múltiplos sentidos da impessoalidade e suas aplicações práticas",
+      "theoryMap": [
+        "Impessoalidade apresenta cinco sentidos:",
+        "1. Princípio da finalidade: sentido amplo = interesse público; sentido estrito = finalidade específica prevista em lei",
+        "2. Validade do ato do agente de fato: atos de agente irregular (sem concurso) são imputados ao Estado - se investidura desfeita, atos permanecem válidos",
+        "3. Princípio da igualdade/isonomia: Administração atende todos sem discriminações - proíbe favorecimentos e perseguições indevidas",
+        "4. Vedação de promoção pessoal: agentes atuam em nome do Estado - proíbe personalização/promoção pessoal (CF, art. 37, §1º: publicidade sem nomes/símbolos/imagens que caracterizem promoção pessoal)",
+        "5. Impedimento e suspeição: afasta do processo quem não tem imparcialidade por parentesco, amizade ou inimizade"
+      ],
+      "explanationMd": "A publicidade com foto/nome do prefeito viola a vedação de promoção pessoal (CF, art. 37, §1º). A esposa julgando processo do servidor cria situação de impedimento por parentesco, violando imparcialidade. Os atos do agente sem concurso (agente de fato) permanecem válidos pela teoria da imputação ao Estado, protegendo terceiros de boa-fé. Os três casos demonstram facetas distintas da impessoalidade: finalidade pública, proteção de terceiros e imparcialidade processual.",
+      "applicationMd": "Questões típicas: (1) publicidade governamental com foto de autoridade - viola vedação de promoção pessoal; (2) autoridade julga parente - impedimento obrigatório; (3) atos de agente irregular - válidos perante terceiros de boa-fé. Pegadinha: afirmar que atos de agente sem concurso são sempre nulos. Erro: esquecer que impessoalidade protege terceiros (atos permanecem válidos). Bancas exploram os cinco sentidos separadamente.",
+      "simpleEmenda": "Impessoalidade: (1) finalidade = interesse público; (2) atos de agente irregular = válidos; (3) isonomia = sem favorecimentos; (4) vedação de promoção pessoal (CF, art. 37, §1º); (5) impedimento/suspeição = imparcialidade. Atos são do Estado, não do agente.",
+      "conceptCore": "Impessoalidade significa que a Administração serve ao interesse público (não a interesses privados do agente) e que os atos são do Estado (não do agente). Protege tanto a finalidade pública quanto terceiros de boa-fé.",
+      "keyIdea": "Administração age para todos, não para o agente. Atos são do Estado. Publicidade informa, não promove. Julgamento imparcial obrigatório.",
+      "proofTip": "Não confundir os sentidos. Publicidade com foto = promoção pessoal. Parente julgando = impedimento. Ato de agente irregular = válido se terceiro de boa-fé.",
+      "mnemonics": [],
+      "prerequisites": ["Princípio da Legalidade"],
+      "nextTopics": ["Princípio da Moralidade", "Nepotismo"],
+      "appearsInEditais": ["Diversos concursos"],
+      "srs": {
+        "memoryWeight": 4,
+        "initialIntervalDays": 1
+      },
+      "references": [
+        "CF/88, art. 37, §1º",
+        "Cinco sentidos da impessoalidade"
+      ],
+      "tags": ["impessoalidade", "finalidade", "agente de fato", "isonomia", "promoção pessoal", "impedimento"]
+    }
+  ]
+}    
+      

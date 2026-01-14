@@ -7,9 +7,7 @@ import CaseCard from '@/components/CaseCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
 import StatusFilterButtons from '@/components/StatusFilterButtons';
-import StudyStats from '@/components/StudyStats';
-import StatisticsCards from '@/components/StatisticsCards';
-import DashboardStats from '@/components/DashboardStats';
+import ProgressBar from '@/components/ProgressBar';
 import { useFilteredCases, FilterStatus } from '@/hooks/useFilteredCases';
 import caseData from '@/data/cases.json';
 import { Case } from '@/types/case';
@@ -189,10 +187,10 @@ export default function DashboardContent() {
           caseItem.topic.toLowerCase().includes(searchLower) ||
           caseItem.conflict.toLowerCase().includes(searchLower) ||
           caseItem.explanationMd.toLowerCase().includes(searchLower) ||
-          caseItem.keyIdea.toLowerCase().includes(searchLower) ||
-          caseItem.tags.some((tag) =>
+          (caseItem.keyIdea && caseItem.keyIdea.toLowerCase().includes(searchLower)) ||
+          (caseItem.tags && caseItem.tags.some((tag) =>
             tag.toLowerCase().includes(searchLower)
-          )
+          ))
         );
       }
 
@@ -231,7 +229,11 @@ export default function DashboardContent() {
       });
     } else {
       // Sort by date (newer first)
-      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      result.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
     }
 
     return result;
@@ -279,89 +281,57 @@ export default function DashboardContent() {
   }
 
   return (
-    <div className="p-4 md:p-8 w-full">
-      {/* Cabeçalho */}
+    <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
+      {/* Cabeçalho + Busca */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 break-words">Dashboard</h1>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-sm">
-              Gerencie e estude seus casos jurídicos
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 flex-shrink-0 bg-gray-50 px-2 sm:px-3 py-1 rounded-lg">
-            <span>{filteredCases.length} casos</span>
-          </div>
+        <div className="mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            Dashboard
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            {caseData.discipline.name} • {caseData.module.name}
+          </p>
         </div>
-
+        
+        {/* Barra de Progresso Fina */}
+        <ProgressBar />
+        
         {/* Busca */}
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
       </div>
 
-      {/* Resumo de Progresso */}
-      <DashboardStats onStatusFilterClick={handleStatusFilterClick} />
-
-      {/* Filtros de Status - Rápido e Visível */}
+      {/* Filtros de Status */}
       <StatusFilterButtons
         selectedStatus={appliedStatus}
         onStatusChange={setAppliedStatus}
       />
 
-      {/* Disciplina e Módulo */}
-      <div className="mb-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-4 sm:p-6 border border-emerald-100">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 break-words">
-              {caseData.discipline.name}
-            </h2>
-            <p className="text-emerald-700 font-medium mt-1 text-xs sm:text-sm break-words">
-              {caseData.module.name}
-            </p>
-            <p className="text-gray-600 mt-2 text-xs sm:text-sm leading-relaxed max-w-xl">
-              Explore os casos práticos que fundamentam o Direito Administrativo brasileiro.
-              Cada caso inclui narrativa, conflito, explicação teórica e aplicação prática.
-            </p>
-          </div>
-          <div className="flex-shrink-0 min-w-max">
-            <div className="inline-flex items-center gap-1 sm:gap-2 bg-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-emerald-200">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0"></div>
-              <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
-                Atualizado hoje
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* Filtros - em linha única */}
+      <div className="mb-6">
+        <FilterBar
+          disciplines={disciplines}
+          topics={topics}
+          categories={categories}
+          selectedDiscipline={selectedDiscipline}
+          selectedTopics={selectedTopics}
+          selectedCategory={selectedCategory}
+          selectedStatus={appliedStatus}
+          selectedSort={appliedSort}
+          caseCount={filteredCases.length}
+          onDisciplineChange={setSelectedDiscipline}
+          onTopicsChange={setSelectedTopics}
+          onCategoryChange={setSelectedCategory}
+          onStatusChange={setAppliedStatus}
+          onSortChange={setAppliedSort}
+          onApplyFilters={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+        />
       </div>
 
-      {/* Estatísticas de Estudo */}
-      <StudyStats cases={cases} />
-
-      {/* Cards de Estatísticas Resumidas */}
-      <StatisticsCards cases={cases} />
-
-      {/* Filtros */}
-      <FilterBar
-        disciplines={disciplines}
-        topics={topics}
-        categories={categories}
-        selectedDiscipline={selectedDiscipline}
-        selectedTopics={selectedTopics}
-        selectedCategory={selectedCategory}
-        selectedStatus={appliedStatus}
-        selectedSort={appliedSort}
-        caseCount={filteredCases.length}
-        onDisciplineChange={setSelectedDiscipline}
-        onTopicsChange={setSelectedTopics}
-        onCategoryChange={setSelectedCategory}
-        onStatusChange={setAppliedStatus}
-        onSortChange={setAppliedSort}
-        onApplyFilters={handleApplyFilters}
-        onClearFilters={handleClearFilters}
-      />
-
-      {/* Grid de Cards ou Mensagem Vazia */}
+      {/* Grid de Casos */}
+      {/* Grid de Casos */}
       {filteredCases.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="flex flex-col items-center justify-center py-20 px-4">
           <div className="text-center max-w-md">
             <div className="mb-6 flex justify-center">
               {searchTerm ? (
@@ -372,121 +342,79 @@ export default function DashboardContent() {
                 <div className="text-6xl">📚</div>
               )}
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
               {searchTerm
                 ? 'Nenhum caso encontrado'
                 : appliedStatus
                 ? 'Nenhum caso neste status'
                 : 'Nenhum caso disponível'}
             </h3>
-            <p className="text-gray-600 mb-8 text-sm md:text-base leading-relaxed">
+            <p className="text-gray-600 mb-6 text-xs md:text-sm leading-relaxed">
               {searchTerm
-                ? `Não encontramos casos para "${searchTerm}". Tente buscar por:
-                  - Título do caso
-                  - Código (ex: DA-M01-C001)
-                  - Tópico jurídico
-                  - Termos da explicação
-                  - Tags relacionadas`
-                : appliedTopics.length > 0
-                ? 'Nenhum caso encontrado para esses assuntos. Tente alterar os filtros.'
+                ? `Não encontramos casos para "${searchTerm}". Tente alterar sua busca.`
                 : appliedStatus
-                ? 'Nenhum caso com este status. Que tal revisar os pendentes?'
+                ? 'Nenhum caso com este status. Tente filtrar por outro.'
                 : 'Nenhum caso disponível no momento.'}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {(searchTerm || appliedStatus) && (
               <button
                 onClick={handleClearFilters}
-                className="inline-flex items-center justify-center px-6 py-2.5 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors text-sm"
+                className="inline-flex items-center justify-center px-4 py-2 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors text-sm"
               >
                 Limpar Filtros
               </button>
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="inline-flex items-center justify-center px-6 py-2.5 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors text-sm"
-                >
-                  Limpar Busca
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       ) : (
         <div>
-          {/* Indicador de Busca Ativa */}
+          {/* Indicador de Filtros Ativos */}
           {(searchTerm || appliedStatus) && (
-            <div className="mb-6 flex flex-wrap gap-2 items-center">
+            <div className="mb-4 flex flex-wrap gap-2 items-center">
               {searchTerm && (
-                <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-2">
-                  <span className="text-sm text-emerald-700">
-                    <span className="font-semibold">Buscando:</span> "{searchTerm}"
+                <div className="inline-flex items-center gap-2 bg-teal-50 border border-teal-200 rounded-full px-3 py-1.5">
+                  <span className="text-xs text-teal-700">
+                    Buscando: <span className="font-semibold">"{searchTerm}"</span>
                   </span>
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="ml-1 text-emerald-600 hover:text-emerald-800"
+                    className="ml-1 text-teal-600 hover:text-teal-800"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
               )}
               {appliedStatus && (
-                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2">
-                  <span className="text-sm text-blue-700">
-                    <span className="font-semibold">Status:</span>{' '}
-                    {appliedStatus === 'dominado'
-                      ? 'Dominado'
-                      : appliedStatus === 'em-revisao'
-                      ? 'Em Revisão'
-                      : 'Pendente'}
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5">
+                  <span className="text-xs text-blue-700">
+                    Status:{' '}
+                    <span className="font-semibold">
+                      {appliedStatus === 'dominado'
+                        ? 'Dominado'
+                        : appliedStatus === 'em-revisao'
+                        ? 'Em Revisão'
+                        : 'Novo'}
+                    </span>
                   </span>
                   <button
                     onClick={() => setAppliedStatus(null)}
                     className="ml-1 text-blue-600 hover:text-blue-800"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
               )}
             </div>
           )}
 
-          {/* Grid de Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Grid 3 colunas responsivo com espaçamento generoso */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7 lg:gap-8">
             {filteredCases.map((caseItem) => (
               <CaseCard key={caseItem.code} caseData={caseItem} />
             ))}
           </div>
         </div>
       )}
-
-      {/* Estatísticas */}
-      <div className="mt-12 pt-8 border-t border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Estatísticas do Módulo</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-            <div className="text-xl md:text-2xl font-bold text-gray-900">{cases.length}</div>
-            <div className="text-xs md:text-sm text-gray-600">Casos Totais</div>
-          </div>
-          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-            <div className="text-xl md:text-2xl font-bold text-emerald-600">
-              {cases.filter(c => c.priority === 'altissima').length}
-            </div>
-            <div className="text-xs md:text-sm text-gray-600">Altíssima</div>
-          </div>
-          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-            <div className="text-xl md:text-2xl font-bold text-blue-600">
-              {cases.filter(c => c.level === 1).length}
-            </div>
-            <div className="text-xs md:text-sm text-gray-600">Iniciante</div>
-          </div>
-          <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-            <div className="text-xl md:text-2xl font-bold text-purple-600">
-              {cases.filter(c => c.tags.includes('regime-juridico')).length}
-            </div>
-            <div className="text-xs md:text-sm text-gray-600">Regime</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

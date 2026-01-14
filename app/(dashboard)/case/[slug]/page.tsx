@@ -1,14 +1,14 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import caseData from '@/data/cases.json';
-import { Case } from '@/types/case';
-import MemorizationButtons from '@/components/MemorizationButtons';
+import { PrismaClient } from '@prisma/client';
+import FeedbackButtons from '@/components/FeedbackButtons';
 import CaseNavigation from '@/components/CaseNavigation';
 import CustomMarkdown from '@/components/CustomMarkdown';
-import FloatingCaseActionBar from '@/components/FloatingCaseActionBar';
 import { getPreviousCase, getNextCase } from '@/lib/caseNavigation';
-import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap, Brain } from 'lucide-react';
+import { ArrowLeft, BookOpen, Target, Lightbulb, Shield, Zap } from 'lucide-react';
 import Link from 'next/link';
+
+const prisma = new PrismaClient();
 
 interface PageProps {
   params: Promise<{
@@ -16,17 +16,52 @@ interface PageProps {
   }>;
 }
 
+// ISR: Revalidar a cada 1 hora
+export const revalidate = 3600;
+
+// Páginas de alta prioridade são geradas no build
+// Outras são geradas on-demand na primeira requisição
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  return (caseData.cases as Case[]).map((caseItem) => ({
-    slug: caseItem.slug,
-  }));
+  try {
+    // Gerar apenas os top 100 casos mais populares/prioritários
+    const topCases = await prisma.case.findMany({
+      where: { isPublished: true },
+      select: { slug: true },
+      orderBy: [
+        { priority: 'desc' },
+        { level: 'asc' },
+      ],
+      take: 100,
+    });
+    
+    return topCases.map((caseItem) => ({
+      slug: caseItem.slug,
+    }));
+  } catch (error) {
+    console.error('Erro ao gerar static params:', error);
+    return [];
+  }
 }
 
 export default async function CasePage({ params }: PageProps) {
   const { slug } = await params;
-  const caseItem = (caseData.cases as Case[]).find(
-    (c) => c.slug === slug
-  );
+  
+  const caseItem = await prisma.case.findUnique({
+    where: { slug },
+    include: {
+      mnemonics: true,
+      references: true,
+      tags: {
+        include: { tag: true },
+      },
+    },
+  });
+
+  if (!caseItem || !caseItem.isPublished) {
+    notFound();
+  }
 
   if (!caseItem) {
     notFound();
@@ -47,7 +82,6 @@ export default async function CasePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
-      <FloatingCaseActionBar caseTitle={caseItem.title} caseSlug={caseItem.slug} />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
@@ -73,13 +107,13 @@ export default async function CasePage({ params }: PageProps) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full lg:pr-40 pb-40 lg:pb-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full pb-16 lg:pb-8">
         {/* Cabeçalho do Caso */}
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-4">
-            <span className="font-medium">{caseData.discipline.name}</span>
+            <span className="font-medium">Direito Administrativo</span>
             <span className="hidden sm:inline">•</span>
-            <span className="hidden sm:inline">{caseData.module.name}</span>
+            <span className="hidden sm:inline">{caseItem.topic}</span>
             <span className="hidden sm:inline">•</span>
             <span>{caseItem.code}</span>
           </div>
@@ -106,7 +140,7 @@ export default async function CasePage({ params }: PageProps) {
         </div>
 
         {/* Seções Principais */}
-        <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-5 sm:space-y-6">
           {/* Narrativa */}
           <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200 shadow-sm">
             <div className="flex items-start gap-2 sm:gap-3 mb-6">
@@ -182,7 +216,7 @@ export default async function CasePage({ params }: PageProps) {
           </section>
 
           {/* Mnemônicos */}
-          {caseItem.mnemonics.length > 0 && (
+          {caseItem.mnemonics && caseItem.mnemonics.length > 0 && (
             <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">🧠 Mnemônicos</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -191,7 +225,7 @@ export default async function CasePage({ params }: PageProps) {
                     key={index}
                     className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200"
                   >
-                    <div className="text-sm sm:text-base text-gray-800">{mnemonic}</div>
+                    <div className="text-sm sm:text-base text-gray-800">{mnemonic.text}</div>
                   </div>
                 ))}
               </div>
@@ -199,46 +233,39 @@ export default async function CasePage({ params }: PageProps) {
           )}
 
           {/* Referências */}
-          <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">📚 Referências</h3>
-            <ul className="space-y-2">
-              {caseItem.references.map((reference, index) => (
-                <li key={index} className="text-sm sm:text-base text-gray-700">
-                  • {reference}
-                </li>
-              ))}
-            </ul>
-          </section>
+          {caseItem.references && caseItem.references.length > 0 && (
+            <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200">
+              <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-3">📚 Referências</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                {caseItem.references.map((reference, index) => (
+                  <div key={index} className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <span className="font-medium">•</span> {reference.text}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Tags */}
+          {caseItem.tags && caseItem.tags.length > 0 && (
           <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">🏷️ Tags</h3>
+            <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-3">🏷️ Tags</h3>
             <div className="flex flex-wrap gap-2">
-              {caseItem.tags.map((tag) => (
+              {caseItem.tags.map((tagRel) => (
                 <span
-                  key={tag}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs sm:text-sm border border-gray-300"
+                  key={tagRel.tag.id}
+                  className="px-2 sm:px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium"
                 >
-                  {tag}
+                  {tagRel.tag.name}
                 </span>
               ))}
             </div>
           </section>
+          )}
 
-          {/* Botões de Memorização */}
-          <section className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-emerald-200 shadow-md">
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-emerald-100 rounded-full mb-4">
-                <Brain className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                Sistema de Memorização
-              </h3>
-              <p className="text-sm sm:text-base text-gray-600">
-                Avalie seu nível de compreensão e o sistema calculará quando revisar
-              </p>
-            </div>
-            <MemorizationButtons caseId={caseItem.code} />
+          {/* Feedback de Compreensão */}
+          <section className="pt-2 sm:pt-4">
+            <FeedbackButtons caseId={caseItem.code} />
           </section>
 
           {/* Navegação entre Casos */}

@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo principal de Casos de Direito Administrativo
+model Case {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  title           String                           // Título descritivo do caso
+  slug            String   @unique                 // URL-friendly identifier
+  
+  // Classificação temática
+  axis            String?                          // Ex: "Princípios", "Atos Administrativos"
+  topic           String                           // Ex: "Regime de direito público × regime de direito privado"
+  subtopics       String[]                         // Array de subtópicos
+  conceptCore     String?                          // Conceito central do caso
+  
+  // Origem/Fonte do Caso
+  originSource    String   @default("Geral")       // Ex: "Geral", "Apostila", "Prova"
+  originConcurso  String?                          // Ex: "PF 2025", "TJ 2024", "OAB"
+  originYear      Int?                             // Ex: 2025, 2024
+  
+  // Conteúdo estruturado (Markdown)
+  narrativeMd     String   @db.Text
+  conflict        String   @db.Text
+  explanationMd   String   @db.Text
+  applicationMd   String   @db.Text
+  keyIdea         String?
+  proofTip        String?
+  
+  // Contexto e metadados
+  context         String?
+  level           Int      @default(1)             // 1, 2, 3, 4 (dificuldade)
+  priority        String   @default("media")       // "altissima", "alta", "media", "baixa"
+  
+  // Emenda simplificada
+  simpleEmenda    String   @db.Text
+  
+  // Pré-requisitos e próximos tópicos
+  prerequisites   String[]                         // Tópicos que devem ser estudados antes
+  nextTopics      String[]                         // Tópicos recomendados após este caso
+  appearsInEditais String[]                        // Editais onde o caso aparece (ex: TCE, TRT, PF)
+  
+  // SRS (Spaced Repetition System)
+  srsWeight       Float    @default(1.0)           // Peso para algoritmo de repetição espaçada
+  srsInterval     Int      @default(1)             // Intervalo inicial em dias
+  
+  // Status e publicação
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relações
+  mnemonics       Mnemonic[]
+  references      Reference[]
+  tags            CaseTag[]
+  studentProgress StudentProgress[] @relation("StudentProgress")
+  statistics      CaseStatistics? @relation("CaseStatistics")
+
+  // Índices para queries frequentes
+  @@index([slug])
+  @@index([code])
+  @@index([isPublished])
+  @@index([priority])
+  @@index([level])
+  @@index([topic])
+  @@index([axis])
+}
+
+// Mnemonics (Dicas de memorização)
+model Mnemonic {
+  id        String  @id @default(cuid())
+  text      String
+  caseId    String
+  case      Case    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+}
+
+// Referências bibliográficas
+model Reference {
+  id        String  @id @default(cuid())
+  text      String
+  caseId    String
+  case      Case    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+}
+
+// Tags/Labels para casos
+model Tag {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  slug      String      @unique
+  cases     CaseTag[]
+  
+  @@index([slug])
+}
+
+// Relação many-to-many entre Cases e Tags
+model CaseTag {
+  caseId    String
+  tagId     String
+  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tag       Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([caseId, tagId])
+  @@index([caseId])
+  @@index([tagId])
+}
+
+// Progresso do aluno (SRS)
+model StudentProgress {
+  id          String    @id @default(cuid())
+  
+  // Aluno (futuro: autenticação)
+  studentId   String                               // Será gerado/autenticado
+  
+  // Caso estudado
+  caseId      String
+  case        Case      @relation("StudentProgress", fields: [caseId], references: [id], onDelete: Cascade)
+  
+  // Métricas SRS
+  rating      Int?                                 // 0-5: desempenho do aluno
+  repetitions Int      @default(0)                 // Quantas vezes revisou
+  nextReview  DateTime?                            // Próxima data de revisão
+  lastReview  DateTime?                            // Última revisão
+  
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([studentId, caseId])
+  @@index([studentId])
+  @@index([caseId])
+  @@index([nextReview])
+}
+
+// Estatísticas agregadas (cache)
+model CaseStatistics {
+  id              String    @id @default(cuid())
+  caseId          String    @unique
+  case            Case      @relation("CaseStatistics", fields: [caseId], references: [id], onDelete: Cascade)
+  
+  totalStudents   Int       @default(0)
+  avgRating       Float     @default(0.0)
+  timesReviewed   Int       @default(0)
+  
+  updatedAt       DateTime  @updatedAt
+}

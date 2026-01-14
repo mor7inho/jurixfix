@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Case" ADD COLUMN     "proofTip" TEXT,
+ALTER COLUMN "axis" DROP NOT NULL,
+ALTER COLUMN "originYear" DROP NOT NULL,
+ALTER COLUMN "originYear" DROP DEFAULT,
+ALTER COLUMN "conceptCore" DROP NOT NULL;
